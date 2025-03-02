@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+    <changeSet id="20250203181900-1" author="VinhNguyenD23">
+        <insert tableName="tiers">
+            <column name="id" value="0"/>
+            <column name="name" value="ADMIN"/>
+        </insert>
+        <insert tableName="tiers">
+            <column name="id" value="1"/>
+            <column name="name" value="MODERATOR"/>
+        </insert>
+        <insert tableName="tiers">
+            <column name="id" value="2"/>
+            <column name="name" value="USER"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

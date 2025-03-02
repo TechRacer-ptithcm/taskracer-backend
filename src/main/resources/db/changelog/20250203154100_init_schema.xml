@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+
+    <changeSet id="20250203154100-1" author="vinhnguyend23">
+        <validCheckSum>ANY</validCheckSum>
+        <preConditions onFail="MARK_RAN" onFailMessage="Schema social already exists">
+            <sqlCheck expectedResult="0">SELECT count(schema_name)
+                                         FROM information_schema.schemata
+                                         WHERE schema_name = 'social'
+            </sqlCheck>
+        </preConditions>
+        <comment>Create schema social</comment>
+        <sql>CREATE SCHEMA social</sql>
+    </changeSet>
+
+    <changeSet id="20250203154100-2" author="vinhnguyend23">
+        <validCheckSum>ANY</validCheckSum>
+        <preConditions onFail="MARK_RAN" onFailMessage="Schema content already exists">
+            <sqlCheck expectedResult="0">SELECT count(schema_name)
+                                         FROM information_schema.schemata
+                                         WHERE schema_name = 'content'
+            </sqlCheck>
+        </preConditions>
+        <comment>Create schema content</comment>
+        <sql>CREATE SCHEMA content</sql>
+    </changeSet>
+</databaseChangeLog>

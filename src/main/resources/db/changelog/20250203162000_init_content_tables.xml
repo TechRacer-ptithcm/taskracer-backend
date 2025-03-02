@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+
+    <changeSet id="20250203170000-1" author="VinhNguyenD23">
+        <createTable tableName="tasks" schemaName="content">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(255)"/>
+            <column name="parent_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <column name="status" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="priority" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="assigned_to" type="UUID"/>
+            <column name="owner" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="due_date" type="TIMESTAMP"/>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20250203170200-1" author="VinhNguyenD23">
+        <createTable tableName="task_assignees" schemaName="content">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="task_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="assigned_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20250203172500-1" author="VinhNguyenD23">
+        <createTable tableName="team_contents" schemaName="content">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="team_id" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="content" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20250203175200-1" author="VinhNguyenD23">
+        <!-- Foreign Keys for team_content -->
+        <addForeignKeyConstraint baseTableName="team_contents"
+                                 baseTableSchemaName="content"
+                                 baseColumnNames="user_id"
+                                 referencedTableName="users"
+                                 referencedTableSchemaName="social"
+                                 referencedColumnNames="id"
+                                 constraintName="fk_team_content_user"/>
+
+        <addForeignKeyConstraint baseTableName="team_contents"
+                                 baseTableSchemaName="content"
+                                 baseColumnNames="team_id"
+                                 referencedTableName="teams"
+                                 referencedTableSchemaName="social"
+                                 referencedColumnNames="id"
+                                 constraintName="fk_team_content_team"/>
+
+        <!-- Foreign Keys for tasks -->
+        <addForeignKeyConstraint baseTableName="tasks"
+                                 baseTableSchemaName="content"
+                                 baseColumnNames="parent_id"
+                                 referencedTableName="tasks"
+                                 referencedTableSchemaName="content"
+                                 referencedColumnNames="id"
+                                 constraintName="fk_tasks_parent"/>
+
+        <addForeignKeyConstraint baseTableName="tasks"
+                                 baseTableSchemaName="content"
+                                 baseColumnNames="owner"
+                                 referencedTableName="users"
+                                 referencedTableSchemaName="social"
+                                 referencedColumnNames="id"
+                                 constraintName="fk_tasks_owner"/>
+
+        <!-- Foreign Keys for task_assignees -->
+        <addForeignKeyConstraint baseTableName="task_assignees"
+                                 baseTableSchemaName="content"
+                                 baseColumnNames="task_id"
+                                 referencedTableName="tasks"
+                                 referencedTableSchemaName="content"
+                                 referencedColumnNames="id"
+                                 constraintName="fk_task_assignees_task"/>
+
+        <addForeignKeyConstraint baseTableName="task_assignees"
+                                 baseTableSchemaName="content"
+                                 baseColumnNames="user_id"
+                                 referencedTableName="users"
+                                 referencedTableSchemaName="social"
+                                 referencedColumnNames="id"
+                                 constraintName="fk_task_assignees_user"/>
+    </changeSet>
+</databaseChangeLog>
