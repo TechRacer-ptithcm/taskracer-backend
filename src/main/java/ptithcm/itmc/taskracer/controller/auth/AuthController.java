@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import ptithcm.itmc.taskracer.common.web.enumeration.ResponseCode;
 import ptithcm.itmc.taskracer.common.web.response.ErrorObject;
 import ptithcm.itmc.taskracer.common.web.response.ResponseAPI;
+import ptithcm.itmc.taskracer.controller.dto.auth.SignInRequest;
+import ptithcm.itmc.taskracer.controller.dto.auth.SignInResponse;
 import ptithcm.itmc.taskracer.controller.dto.auth.SignUpRequest;
 import ptithcm.itmc.taskracer.controller.dto.auth.SignUpResponse;
 import ptithcm.itmc.taskracer.controller.mapper.auth.AuthControllerMapper;
@@ -43,28 +45,75 @@ public class AuthController {
                     .build();
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (ValidationFailedException e) {
-            var response = ResponseAPI.<SignUpResponse>builder()
+            var response = ResponseAPI.<ErrorObject>builder()
                     .code(ResponseCode.VALIDATE_FAILED.getCode())
                     .message(ResponseCode.VALIDATE_FAILED.getMessage())
                     .status(false)
                     .build();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         } catch (MissingFieldException e) {
-            var response = ResponseAPI.<SignUpResponse>builder()
+            var response = ResponseAPI.<ErrorObject>builder()
                     .code(ResponseCode.MISSING_FIELD.getCode())
                     .message(ResponseCode.MISSING_FIELD.getMessage())
                     .status(false)
                     .build();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         } catch (DuplicateDataException e) {
-            var response = ResponseAPI.<SignUpResponse>builder()
+            var response = ResponseAPI.<ErrorObject>builder()
                     .code(ResponseCode.DUPLICATE_DATA.getCode())
                     .message(ResponseCode.DUPLICATE_DATA.getMessage())
                     .status(false)
                     .build();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         } catch (Exception e) {
-            var response = ResponseAPI.builder()
+            var response = ResponseAPI.<ErrorObject>builder()
+                    .code(ResponseCode.ERROR.getCode())
+                    .message(ResponseCode.ERROR.getMessage())
+                    .status(false)
+                    .data(new ErrorObject(e.getMessage()))
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+    @PostMapping("sign-in")
+    public ResponseEntity<ResponseAPI<?>> signIn(@RequestBody SignInRequest request) {
+        try {
+            log.info("Sign In: {}", request);
+            if (request.getInputAccount().isEmpty() || request.getPassword().isEmpty())
+                throw new MissingFieldException("Missing field.");
+            var data = authService.signIn(authControllerMapper.toSignInDto(request));
+            var result = authControllerMapper.toSignInResponse(data);
+            var response = ResponseAPI.<SignInResponse>builder()
+                    .code(ResponseCode.SUCCESS.getCode())
+                    .message(ResponseCode.SUCCESS.getMessage())
+                    .status(true)
+                    .data(result)
+                    .build();
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (ValidationFailedException e) {
+            var response = ResponseAPI.<ErrorObject>builder()
+                    .code(ResponseCode.VALIDATE_FAILED.getCode())
+                    .message(ResponseCode.VALIDATE_FAILED.getMessage())
+                    .status(false)
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        } catch (MissingFieldException e) {
+            var response = ResponseAPI.<ErrorObject>builder()
+                    .code(ResponseCode.MISSING_FIELD.getCode())
+                    .message(ResponseCode.MISSING_FIELD.getMessage())
+                    .status(false)
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        } catch (DuplicateDataException e) {
+            var response = ResponseAPI.<ErrorObject>builder()
+                    .code(ResponseCode.DUPLICATE_DATA.getCode())
+                    .message(ResponseCode.DUPLICATE_DATA.getMessage())
+                    .status(false)
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        } catch (Exception e) {
+            var response = ResponseAPI.<ErrorObject>builder()
                     .code(ResponseCode.ERROR.getCode())
                     .message(ResponseCode.ERROR.getMessage())
                     .status(false)

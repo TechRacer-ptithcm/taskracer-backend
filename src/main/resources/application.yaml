@@ -27,4 +27,4 @@ server:
     context-path: /api
 
 jwt:
-  secret-key: "Test"
+  secret-key: "b5274918-5bb3-49e1-8ed3-5cbb339d77b8"

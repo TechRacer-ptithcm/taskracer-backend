@@ -20,6 +20,7 @@ import ptithcm.itmc.taskracer.common.web.response.ResponseAPI;
 import ptithcm.itmc.taskracer.service.process.user.UserService;
 import ptithcm.itmc.taskracer.util.jwt.JwtUtil;
 
+import javax.security.sasl.AuthenticationException;
 import java.io.IOException;
 
 @RequiredArgsConstructor
@@ -52,6 +53,9 @@ public class JwtFilter extends OncePerRequestFilter {
         }
         try {
             String token = authorizationHeader.substring("Bearer ".length());
+            if (!jwtUtil.validateToken(token)) {
+                throw new AuthenticationException("Invalid JWT token");
+            }
             String username = jwtUtil.extractUsername(token);
             if (username != null) {
                 var user = userService.getUser(username);
