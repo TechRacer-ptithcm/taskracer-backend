@@ -56,6 +56,9 @@ public class JwtFilter extends OncePerRequestFilter {
             if (!jwtUtil.validateToken(token)) {
                 throw new AuthenticationException("Invalid JWT token");
             }
+            if (jwtUtil.isTokenExpired(token)) {
+                throw new AuthenticationException("Expired JWT token");
+            }
             String username = jwtUtil.extractUsername(token);
             if (username != null) {
                 var user = userService.getUser(username);

@@ -1,15 +1,14 @@
 package ptithcm.itmc.taskracer.service.process.auth;
 
+import jakarta.mail.MessagingException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ptithcm.itmc.taskracer.controller.dto.auth.SignInResponse;
 import ptithcm.itmc.taskracer.exception.DuplicateDataException;
 import ptithcm.itmc.taskracer.exception.ResourceNotFound;
-import ptithcm.itmc.taskracer.repository.JpaTierRepository;
 import ptithcm.itmc.taskracer.repository.JpaUserRepository;
-import ptithcm.itmc.taskracer.repository.model.JpaTier;
 import ptithcm.itmc.taskracer.repository.model.enumeration.Gender;
 import ptithcm.itmc.taskracer.repository.model.enumeration.Tier;
 import ptithcm.itmc.taskracer.service.dto.auth.SignInRequestDto;
@@ -17,7 +16,6 @@ import ptithcm.itmc.taskracer.service.dto.auth.SignInResponseDto;
 import ptithcm.itmc.taskracer.service.dto.auth.SignUpRequestDto;
 import ptithcm.itmc.taskracer.service.dto.auth.SignUpResponseDto;
 import ptithcm.itmc.taskracer.service.dto.user.UserDto;
-import ptithcm.itmc.taskracer.service.mapper.auth.AuthServiceMapper;
 import ptithcm.itmc.taskracer.service.mapper.tier.TierMapper;
 import ptithcm.itmc.taskracer.service.mapper.user.UserServiceMapper;
 import ptithcm.itmc.taskracer.util.jwt.JwtUtil;
@@ -33,8 +31,10 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final TierMapper tierMapper;
     private final JwtUtil jwtUtil;
+    private final EmailService emailService;
 
-    public SignUpResponseDto createNewUser(SignUpRequestDto request) {
+    @Transactional
+    public SignUpResponseDto createNewUser(SignUpRequestDto request) throws MessagingException {
         if (jpaUserRepository.findByUsername(request.getUsername()).isPresent() ||
                 jpaUserRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new DuplicateDataException("Username or email already exists.");
@@ -51,6 +51,7 @@ public class AuthService {
                 .build();
         log.info("Create new user: {}", userServiceMapper.toJpaUserDto(user));
         var savedUser = jpaUserRepository.save(userServiceMapper.toJpaUserDto(user));
+        emailService.sendOtp(userServiceMapper.toUserDto(savedUser));
         return SignUpResponseDto.builder()
                 .username(savedUser.getUsername())
                 .email(savedUser.getEmail())
@@ -76,4 +77,6 @@ public class AuthService {
                 .accessToken(jwtUtil.generateToken(userServiceMapper.toUserDto(user), expiredTime))
                 .build();
     }
+
+
 }

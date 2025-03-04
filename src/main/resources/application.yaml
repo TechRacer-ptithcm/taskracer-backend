@@ -6,7 +6,6 @@ spring:
     username: postgres
     password: 123
     driver-class-name: org.postgresql.Driver
-
   jpa:
     hibernate:
       ddl-auto: none
@@ -14,13 +13,24 @@ spring:
 
   h2:
     console:
-      enabled: true
+      enabled: false
 
   liquibase:
     enabled: true
     change-log: classpath:db/master.xml
     default-schema: social
     liquibase-schema: liquibase
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: meowgum.forum.automail@gmail.com
+    password: "japq gkxw ednn msrs"
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 server:
   servlet:

@@ -28,6 +28,7 @@ public class JwtUtil {
                 .setSubject(user.getId().toString())
                 .claim("username", user.getUsername())
                 .claim("email", user.getEmail())
+                .claim("tier", user.getTier().name())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + time))
                 .signWith(Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8)), SignatureAlgorithm.HS256)
@@ -43,7 +44,11 @@ public class JwtUtil {
         return claimsResolver.apply(claims);
     }
 
-    private Claims extractAllClaims(String token) {
+    public String getClaim(String token, String claim) {
+        return extractClaim(token, claims -> claims.get(claim, String.class));
+    }
+
+    public Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()))
                 .build()
@@ -65,7 +70,7 @@ public class JwtUtil {
         }
     }
 
-    private boolean isTokenExpired(String token) {
+    public boolean isTokenExpired(String token) {
         return extractClaim(token, Claims::getExpiration).before(new Date());
     }
 }
