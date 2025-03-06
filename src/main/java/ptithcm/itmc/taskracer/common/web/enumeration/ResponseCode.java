@@ -18,8 +18,8 @@ public enum ResponseCode {
     AUTHENTICATION_FAILED("400001", "Authentication failed."),
     VALIDATE_FAILED("500001", "Validate failed."),
     DUPLICATE_DATA("500002", "Duplicate data."),
-    MISSING_FIELD("600001", "Missing field.");
-
+    MISSING_FIELD("600001", "Missing field."),
+    EXPIRED_CODE("900001", "The code has expired.");
 
     private final String code;
     private final String message;

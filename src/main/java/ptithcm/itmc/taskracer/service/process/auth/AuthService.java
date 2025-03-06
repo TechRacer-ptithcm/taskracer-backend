@@ -7,19 +7,21 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ptithcm.itmc.taskracer.exception.DuplicateDataException;
+import ptithcm.itmc.taskracer.exception.ExpiredException;
 import ptithcm.itmc.taskracer.exception.ResourceNotFound;
+import ptithcm.itmc.taskracer.repository.JpaOtpRepository;
 import ptithcm.itmc.taskracer.repository.JpaUserRepository;
 import ptithcm.itmc.taskracer.repository.model.enumeration.Gender;
 import ptithcm.itmc.taskracer.repository.model.enumeration.Tier;
-import ptithcm.itmc.taskracer.service.dto.auth.SignInRequestDto;
-import ptithcm.itmc.taskracer.service.dto.auth.SignInResponseDto;
-import ptithcm.itmc.taskracer.service.dto.auth.SignUpRequestDto;
-import ptithcm.itmc.taskracer.service.dto.auth.SignUpResponseDto;
+import ptithcm.itmc.taskracer.service.dto.auth.*;
 import ptithcm.itmc.taskracer.service.dto.user.UserDto;
 import ptithcm.itmc.taskracer.service.mapper.tier.TierMapper;
 import ptithcm.itmc.taskracer.service.mapper.user.UserServiceMapper;
+import ptithcm.itmc.taskracer.util.jwt.AesTokenUtil;
 import ptithcm.itmc.taskracer.util.jwt.JwtUtil;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -32,6 +34,8 @@ public class AuthService {
     private final TierMapper tierMapper;
     private final JwtUtil jwtUtil;
     private final EmailService emailService;
+    private final JpaOtpRepository jpaOtpRepository;
+    private final AesTokenUtil aesTokenUtil;
 
     @Transactional
     public SignUpResponseDto createNewUser(SignUpRequestDto request) throws MessagingException {
@@ -78,5 +82,51 @@ public class AuthService {
                 .build();
     }
 
+    @Transactional
+    public void verifyAccount(String otp) {
+        var otpData = jpaOtpRepository.findByOtp(otp)
+                .filter(object -> object.getExpireAt().isAfter(LocalDateTime.now()))
+                .orElseThrow(() -> new ExpiredException("OTP is not found or already used."));
+        jpaUserRepository.findById(otpData.getUser().getId()).ifPresent(user -> user.setActive(true));
+        jpaOtpRepository.delete(otpData);
+    }
 
+    @Transactional
+    public void sendOtpForgotPassword(String account) throws MessagingException {
+        var user = jpaUserRepository.findByEmail(account)
+                .or(() -> jpaUserRepository.findByUsername(account))
+                .orElseThrow(() -> new ResourceNotFound("Email or username not found."));
+        emailService.sendOtp(userServiceMapper.toUserDto(user));
+    }
+
+    public OtpForgotPasswordDto VerifyChangePassword(String otp) throws Exception {
+        var otpData = jpaOtpRepository.findByOtp(otp)
+                .filter(object -> object.getExpireAt().isAfter(LocalDateTime.now()))
+                .orElseThrow(() -> new ExpiredException("OTP is not found or already used."));
+        var userData = jpaUserRepository.findById(otpData.getUser().getId())
+                .orElseThrow(() -> new ResourceNotFound("User not found."));
+        var expiredTime = LocalDateTime.now()
+                .plusMinutes(5)
+                .atZone(ZoneId.systemDefault())
+                .toInstant()
+                .toEpochMilli();
+        log.info("timestamp: {}", expiredTime);
+        var token = aesTokenUtil.encrypt(userData.getUsername(), userData.getEmail(), expiredTime);
+        var result = OtpForgotPasswordDto.builder()
+                .privateToken(token)
+                .build();
+        log.info(token);
+        jpaOtpRepository.delete(otpData);
+        return result;
+    }
+
+    @Transactional
+    public void changePassword(String token, String newPassword) throws Exception {
+        String[] resultData = aesTokenUtil.decrypt(token);
+        var userData = jpaUserRepository.findByUsername(resultData[0])
+                .or(() -> jpaUserRepository.findByEmail(resultData[1]))
+                .orElseThrow(() -> new ResourceNotFound("User not found."));
+        userData.setPassword(passwordEncoder.encode(newPassword));
+        jpaUserRepository.save(userData);
+    }
 }
