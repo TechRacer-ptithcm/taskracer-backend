@@ -14,9 +14,10 @@ import ptithcm.itmc.taskracer.service.mapper.user.UserServiceMapper;
 public class UserService {
     private final JpaUserRepository jpaUserRepository;
     private final UserServiceMapper userServiceMapper;
+
     public UserDto getUser(String username) {
         var data = jpaUserRepository.findByUsername(username);
-        if(data.isEmpty()) {
+        if (data.isEmpty()) {
             throw new ResourceNotFound("User not found.");
         }
         return userServiceMapper.toUserDto(data.get());
