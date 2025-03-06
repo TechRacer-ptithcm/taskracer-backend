@@ -1,5 +1,6 @@
 package ptithcm.itmc.taskracer.controller.user;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,7 @@ public class UserController {
     private final UserControllerMapper userControllerMapper;
 
     @GetMapping("user")
+    @SecurityRequirement(name = "Bearer Authentication")
     public ResponseEntity<ResponseAPI<?>> getUserInfo() {
         var principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var userData = ParseObject.parse(principal, UserDto.class);
