@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import ptithcm.itmc.taskracer.common.web.enumeration.ResponseCode;
 import ptithcm.itmc.taskracer.common.web.response.ErrorObject;
 import ptithcm.itmc.taskracer.common.web.response.ResponseAPI;
@@ -17,6 +18,8 @@ import ptithcm.itmc.taskracer.controller.mapper.auth.AuthControllerMapper;
 import ptithcm.itmc.taskracer.exception.*;
 import ptithcm.itmc.taskracer.service.process.auth.AuthService;
 
+
+@RestController
 @Controller
 @RequestMapping("auth")
 @RequiredArgsConstructor

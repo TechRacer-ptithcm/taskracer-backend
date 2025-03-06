@@ -7,6 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import ptithcm.itmc.taskracer.common.web.enumeration.ResponseCode;
 import ptithcm.itmc.taskracer.common.web.response.ResponseAPI;
 import ptithcm.itmc.taskracer.controller.mapper.user.UserControllerMapper;
@@ -14,6 +15,7 @@ import ptithcm.itmc.taskracer.service.dto.user.UserDto;
 import ptithcm.itmc.taskracer.service.process.user.UserService;
 import ptithcm.itmc.taskracer.util.json.ParseObject;
 
+@RestController
 @Controller
 @RequestMapping("social")
 @RequiredArgsConstructor

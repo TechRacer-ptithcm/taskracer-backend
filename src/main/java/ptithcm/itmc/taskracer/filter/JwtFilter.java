@@ -33,10 +33,22 @@ public class JwtFilter extends OncePerRequestFilter {
         ObjectMapper objectMapper = new ObjectMapper();
         String requestUri = request.getRequestURI();
         log.info("Request URI: {}", requestUri);
-        if (requestUri.startsWith("/api/auth/")) {
-            filterChain.doFilter(request, response);
-            return;
+        String[] bypassPaths = {
+                "/api/auth",
+                "/api/docs",
+                "/api/swagger-ui",
+                "/api/api-docs"};
+        for (String bypassPath : bypassPaths) {
+            if (requestUri.startsWith(bypassPath)) {
+                filterChain.doFilter(request, response);
+                return;
+            }
         }
+
+//        if (requestUri.startsWith("/api/auth/") || requestUri.startsWith("/api/docs")) {
+//            filterChain.doFilter(request, response);
+//            return;
+//        }
         String authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
