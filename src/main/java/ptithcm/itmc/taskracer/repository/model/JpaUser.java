@@ -3,10 +3,8 @@ package ptithcm.itmc.taskracer.repository.model;
 import jakarta.persistence.*;
 import lombok.*;
 import ptithcm.itmc.taskracer.repository.model.enumeration.Gender;
-import ptithcm.itmc.taskracer.repository.model.enumeration.Tier;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Set;
 import java.util.UUID;
 

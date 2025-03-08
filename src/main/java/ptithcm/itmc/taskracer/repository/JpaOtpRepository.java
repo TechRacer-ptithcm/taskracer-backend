@@ -6,6 +6,7 @@ import ptithcm.itmc.taskracer.repository.model.JpaOtp;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+@Deprecated
 public interface JpaOtpRepository extends JpaRepository<JpaOtp, Integer> {
     Optional<JpaOtp> findByOtp(String otp);
 

@@ -4,12 +4,12 @@ import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ptithcm.itmc.taskracer.exception.DuplicateDataException;
 import ptithcm.itmc.taskracer.exception.ExpiredException;
 import ptithcm.itmc.taskracer.exception.ResourceNotFound;
-import ptithcm.itmc.taskracer.repository.JpaOtpRepository;
 import ptithcm.itmc.taskracer.repository.JpaUserRepository;
 import ptithcm.itmc.taskracer.repository.model.enumeration.Gender;
 import ptithcm.itmc.taskracer.repository.model.enumeration.Tier;
@@ -34,8 +34,10 @@ public class AuthService {
     private final TierMapper tierMapper;
     private final JwtUtil jwtUtil;
     private final EmailService emailService;
-    private final JpaOtpRepository jpaOtpRepository;
+    //    private final JpaOtpRepository jpaOtpRepository;
     private final AesTokenUtil aesTokenUtil;
+    private final RedisTemplate<String, Object> redisTemplate;
+
 
     @Transactional
     public SignUpResponseDto createNewUser(SignUpRequestDto request) throws MessagingException {
@@ -84,11 +86,11 @@ public class AuthService {
 
     @Transactional
     public void verifyAccount(String otp) {
-        var otpData = jpaOtpRepository.findByOtp(otp)
-                .filter(object -> object.getExpireAt().isAfter(LocalDateTime.now()))
-                .orElseThrow(() -> new ExpiredException("OTP is not found or already used."));
-        jpaUserRepository.findById(otpData.getUser().getId()).ifPresent(user -> user.setActive(true));
-        jpaOtpRepository.delete(otpData);
+        if (!redisTemplate.hasKey("otp:" + otp)) throw new ExpiredException("OTP is not found or already used.");
+        String getUsername = (String) redisTemplate.opsForValue().get(otp);
+        redisTemplate.delete(otp);
+        jpaUserRepository.findByUsername(getUsername)
+                .ifPresent(user -> user.setActive(true));
     }
 
     @Transactional
@@ -100,10 +102,12 @@ public class AuthService {
     }
 
     public OtpForgotPasswordDto VerifyChangePassword(String otp) throws Exception {
-        var otpData = jpaOtpRepository.findByOtp(otp)
-                .filter(object -> object.getExpireAt().isAfter(LocalDateTime.now()))
-                .orElseThrow(() -> new ExpiredException("OTP is not found or already used."));
-        var userData = jpaUserRepository.findById(otpData.getUser().getId())
+        if (!redisTemplate.hasKey("otp:" + otp)) throw new ExpiredException("OTP is not found or already used.");
+        String getUsername = (String) redisTemplate.opsForValue().get("otp:" + otp);
+//        var otpData = jpaOtpRepository.findByOtp(otp)
+//                .filter(object -> object.getExpireAt().isAfter(LocalDateTime.now()))
+//                .orElseThrow(() -> new ExpiredException("OTP is not found or already used."));
+        var userData = jpaUserRepository.findByUsername(getUsername)
                 .orElseThrow(() -> new ResourceNotFound("User not found."));
         var expiredTime = LocalDateTime.now()
                 .plusMinutes(5)
@@ -116,7 +120,7 @@ public class AuthService {
                 .privateToken(token)
                 .build();
         log.info(token);
-        jpaOtpRepository.delete(otpData);
+//        jpaOtpRepository.delete(otpData);
         return result;
     }
 

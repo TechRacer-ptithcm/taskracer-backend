@@ -6,6 +6,7 @@ import ptithcm.itmc.taskracer.repository.model.JpaOtp;
 import ptithcm.itmc.taskracer.service.dto.auth.OtpCodeDto;
 
 @Mapper(componentModel = "spring")
+@Deprecated
 public interface AuthServiceMapper {
 
     @Mapping(target = "user.id", source = "userId")
