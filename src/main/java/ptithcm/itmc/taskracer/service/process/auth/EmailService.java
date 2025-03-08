@@ -33,7 +33,7 @@ public class EmailService {
                 TimeUnit.of(java.time.temporal.ChronoUnit.MINUTES));
         helper.setTo(userData.getEmail());
         helper.setSubject("OTP Code");
-        helper.setText("Your active code: " + otpCode + ". This code will be expired in 5 minutes", true);
+        helper.setText("Your code: " + otpCode + ". This code will be expired in 5 minutes", true);
         log.info("Data email: {}", helper.getMimeMessage());
         javaMailSender.send(helper.getMimeMessage());
 //        OtpCodeDto otp = OtpCodeDto.builder()
