@@ -3,9 +3,11 @@ package ptithcm.itmc.taskracer.service.process.user;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import ptithcm.itmc.taskracer.common.web.response.PageableObject;
 import ptithcm.itmc.taskracer.exception.ResourceNotFound;
 import ptithcm.itmc.taskracer.repository.JpaUserRepository;
 import ptithcm.itmc.taskracer.service.dto.user.UserDto;
@@ -51,8 +53,14 @@ public class UserService {
         jpaUserRepository.save(userData);
     }
 
-    public List<UserDto> getAllUser() {
-        return userServiceMapper.toListUserDto(jpaUserRepository.findAll());
+    public PageableObject<List<UserDto>> getAllUser(Pageable pageable) {
+        var data = jpaUserRepository.findAll(pageable);
+        return PageableObject.<List<UserDto>>builder()
+                .content(userServiceMapper.toListUserDto(data.getContent()))
+                .totalElements(data.getTotalElements())
+                .totalPage(data.getTotalPages())
+                .currentPage(data.getNumber())
+                .build();
     }
 
 
