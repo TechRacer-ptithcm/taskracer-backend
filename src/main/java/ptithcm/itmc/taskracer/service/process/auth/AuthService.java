@@ -55,7 +55,6 @@ public class AuthService {
                 .score(0)
                 .name("")
                 .build();
-        log.info("Create new user: {}", userServiceMapper.toJpaUserDto(user));
         var savedUser = jpaUserRepository.save(userServiceMapper.toJpaUserDto(user));
         emailService.sendOtp(userServiceMapper.toUserDto(savedUser));
         return SignUpResponseDto.builder()
@@ -88,7 +87,7 @@ public class AuthService {
     public void verifyAccount(String otp) {
         if (!redisTemplate.hasKey("otp:" + otp)) throw new ExpiredException("OTP is not found or already used.");
         String getUsername = (String) redisTemplate.opsForValue().get(otp);
-        redisTemplate.delete(otp);
+        redisTemplate.delete("otp:" + otp);
         jpaUserRepository.findByUsername(getUsername)
                 .ifPresent(user -> user.setActive(true));
     }
@@ -102,7 +101,7 @@ public class AuthService {
     }
 
     public OtpForgotPasswordDto VerifyChangePassword(String otp) throws Exception {
-        if (!redisTemplate.hasKey("otp:" + otp)) throw new ExpiredException("OTP is not found or already used.");
+        if (emailService.verifyOtp(otp)) throw new ExpiredException("OTP is not found or already used.");
         String getUsername = (String) redisTemplate.opsForValue().get("otp:" + otp);
 //        var otpData = jpaOtpRepository.findByOtp(otp)
 //                .filter(object -> object.getExpireAt().isAfter(LocalDateTime.now()))
@@ -124,13 +123,11 @@ public class AuthService {
         return result;
     }
 
-    @Transactional
-    public void changePassword(String token, String newPassword) throws Exception {
-        String[] resultData = aesTokenUtil.decrypt(token);
-        var userData = jpaUserRepository.findByUsername(resultData[0])
-                .or(() -> jpaUserRepository.findByEmail(resultData[1]))
-                .orElseThrow(() -> new ResourceNotFound("User not found."));
-        userData.setPassword(passwordEncoder.encode(newPassword));
-        jpaUserRepository.save(userData);
+
+    public void resendOtp(String account) throws MessagingException {
+        var user = jpaUserRepository.findByEmail(account)
+                .or(() -> jpaUserRepository.findByUsername(account))
+                .orElseThrow(() -> new ResourceNotFound("Email or username not found."));
+        emailService.sendOtp(userServiceMapper.toUserDto(user));
     }
 }

@@ -1,15 +1,19 @@
 package ptithcm.itmc.taskracer.service.process.user;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ptithcm.itmc.taskracer.exception.ResourceNotFound;
 import ptithcm.itmc.taskracer.repository.JpaUserRepository;
 import ptithcm.itmc.taskracer.service.dto.user.UserDto;
 import ptithcm.itmc.taskracer.service.mapper.user.UserServiceMapper;
+import ptithcm.itmc.taskracer.util.jwt.AesTokenUtil;
 
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -18,7 +22,9 @@ import java.util.concurrent.TimeUnit;
 public class UserService {
     private final JpaUserRepository jpaUserRepository;
     private final UserServiceMapper userServiceMapper;
+    private final PasswordEncoder passwordEncoder;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final AesTokenUtil aesTokenUtil;
 
     //    @Cacheable(value = "users", key = "T(java.lang.String).format('user:%s:info', #username)", unless = "#username == null")
     public UserDto getUser(String username) {
@@ -34,4 +40,20 @@ public class UserService {
         redisTemplate.opsForValue().set("users:user:" + username + ":info", userData, 5, TimeUnit.of(ChronoUnit.MINUTES));
         return userData;
     }
+
+    @Transactional
+    public void changePassword(String token, String newPassword) throws Exception {
+        String[] resultData = aesTokenUtil.decrypt(token);
+        var userData = jpaUserRepository.findByUsername(resultData[0])
+                .or(() -> jpaUserRepository.findByEmail(resultData[1]))
+                .orElseThrow(() -> new ResourceNotFound("User not found."));
+        userData.setPassword(passwordEncoder.encode(newPassword));
+        jpaUserRepository.save(userData);
+    }
+
+    public List<UserDto> getAllUser() {
+        return userServiceMapper.toListUserDto(jpaUserRepository.findAll());
+    }
+
+
 }

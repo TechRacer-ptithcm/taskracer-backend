@@ -32,7 +32,6 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         String requestUri = request.getRequestURI();
-        log.info("Request URI: {}", requestUri);
         String[] bypassPaths = {
                 "/api/auth",
                 "/api/docs",
@@ -93,12 +92,11 @@ public class JwtFilter extends OncePerRequestFilter {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
             objectMapper.writeValue(response.getWriter(), ResponseAPI.builder()
-                    .code(ResponseCode.MISSING_FIELD.getCode())
-                    .message(ResponseCode.MISSING_FIELD.getMessage())
+                    .code(ResponseCode.EXPIRED_CODE.getCode())
+                    .message(ResponseCode.EXPIRED_CODE.getMessage())
                     .status(false)
                     .data(new ErrorObject(e.getMessage()))
                     .build());
-            return;
         }
 //        filterChain.doFilter(request, response);
     }
