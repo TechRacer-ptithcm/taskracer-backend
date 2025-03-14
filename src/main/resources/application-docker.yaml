@@ -1,0 +1,52 @@
+spring:
+  application:
+    name: TaskRacer
+  datasource:
+    url: jdbc:postgresql://postgres:5432/TaskRacer_test
+    username: postgres
+    password: 123
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+
+  h2:
+    console:
+      enabled: false
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/master.xml
+    default-schema: social
+    liquibase-schema: liquibase
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: meowgum.forum.automail@gmail.com
+    password: "japq gkxw ednn msrs"
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  data:
+    redis:
+      host: redis
+      port: 6379
+server:
+  servlet:
+    context-path: /api
+
+jwt:
+  secret-key: "b5274918-5bb3-49e1-8ed3-5cbb339d77b8"
+
+task-racer:
+  private-key: "aca71827026bafe927b66952c6e3eb88"
+
+springdoc:
+  swagger-ui:
+    path: "/docs"
+  api-docs:
+    path: "/api-docs"
