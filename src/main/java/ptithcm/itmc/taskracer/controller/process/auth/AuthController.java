@@ -1,6 +1,7 @@
 package ptithcm.itmc.taskracer.controller.process.auth;
 
 import jakarta.mail.MessagingException;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -29,7 +30,7 @@ public class AuthController {
     private final AuthControllerMapper authControllerMapper;
 
     @PostMapping("sign-up")
-    public ResponseEntity<ResponseAPI<?>> createNewUser(@RequestBody SignUpRequest request) throws MessagingException {
+    public ResponseEntity<ResponseAPI<?>> createNewUser(@Valid @RequestBody SignUpRequest request) throws MessagingException {
         log.info("Create new user: {}", request);
         if (request.getUsername().isEmpty() || request.getPassword().isEmpty() || request.getEmail().isEmpty())
             throw new MissingFieldException("Missing field.");
