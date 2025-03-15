@@ -85,10 +85,11 @@ public class AuthService {
 
     @Transactional
     public void verifyAccount(String otp) {
-        if (!redisTemplate.hasKey("otp:" + otp)) throw new ExpiredException("OTP is not found or already used.");
-        String getUsername = (String) (redisTemplate.opsForValue().get("otp:" + otp));
+        String key = "otp:" + otp;
+        if (!redisTemplate.hasKey(key)) throw new ExpiredException("OTP is not found or already used.");
+        String getUsername = (String) (redisTemplate.opsForValue().get(key));
         log.info("otp get username: {}", getUsername);
-        redisTemplate.delete("otp:" + otp);
+        redisTemplate.delete(key);
         jpaUserRepository.findByUsername(getUsername)
                 .ifPresent(user -> user.setActive(true));
     }

@@ -30,16 +30,17 @@ public class UserService {
 
     //    @Cacheable(value = "users", key = "T(java.lang.String).format('user:%s:info', #username)", unless = "#username == null")
     public UserDto getUser(String username) {
-        if (redisTemplate.opsForValue().get("users:user:" + username + ":info") != null) {
-            log.info("userData: {}", redisTemplate.opsForValue().get("users:user:" + username + ":info"));
-            return (UserDto) redisTemplate.opsForValue().get("users:user:" + username + ":info");
+        String key = "users:user:" + username + ":info";
+        if (redisTemplate.opsForValue().get(key) != null) {
+            log.info("userData: {}", redisTemplate.opsForValue().get(key));
+            return (UserDto) redisTemplate.opsForValue().get(key);
         }
         var data = jpaUserRepository.findByUsername(username);
         if (data.isEmpty()) {
             throw new ResourceNotFound("User not found.");
         }
         var userData = userServiceMapper.toUserDto(data.get());
-        redisTemplate.opsForValue().set("users:user:" + username + ":info", userData, 5, TimeUnit.of(ChronoUnit.MINUTES));
+        redisTemplate.opsForValue().set(key, userData, 5, TimeUnit.of(ChronoUnit.MINUTES));
         return userData;
     }
 

@@ -1,23 +1,26 @@
-package ptithcm.itmc.taskracer.repository.model;
+package ptithcm.itmc.taskracer.controller.dto.task;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ptithcm.itmc.taskracer.repository.model.JpaTask;
+import ptithcm.itmc.taskracer.repository.model.JpaUser;
 import ptithcm.itmc.taskracer.repository.model.enumeration.Priority;
 import ptithcm.itmc.taskracer.repository.model.enumeration.ResourceType;
 import ptithcm.itmc.taskracer.repository.model.enumeration.TaskStatus;
+import ptithcm.itmc.taskracer.service.dto.user.UserDto;
 
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
-@Entity
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "tasks", schema = "content")
-public class JpaTask {
+public class TaskResponse {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -36,30 +39,17 @@ public class JpaTask {
     @JoinColumn(name = "owner_id", nullable = false)
     private JpaUser owner;
 
-    @Column(nullable = false)
     private String content;
 
-    @Column(nullable = false)
     private Priority priority;
 
     private String description;
 
-    @Column(name = "start_at")
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime startAt;
 
-    @Column(name = "due_at")
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime dueAt;
 
-    @Column(name = "status", nullable = false)
     private TaskStatus status;
 
-    @ManyToMany
-    @JoinTable(name = "task_assignees",
-            schema = "content",
-            joinColumns = @JoinColumn(name = "task_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private Set<JpaUser> users;
-
+    private Set<UserDto> users;
 }
