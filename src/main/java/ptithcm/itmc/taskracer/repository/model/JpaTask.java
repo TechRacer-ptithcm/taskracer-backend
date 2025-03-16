@@ -19,8 +19,8 @@ import java.util.UUID;
 @Table(name = "tasks", schema = "content")
 public class JpaTask {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @OneToOne
     @JoinColumn(name = "parent_id")

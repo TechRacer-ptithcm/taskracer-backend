@@ -14,6 +14,8 @@ import ptithcm.itmc.taskracer.controller.mapper.task.TaskControllerMapper;
 import ptithcm.itmc.taskracer.helper.AuthHelper;
 import ptithcm.itmc.taskracer.service.process.task.TaskService;
 
+import java.util.UUID;
+
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -25,7 +27,8 @@ public class TaskController {
 
     @PostMapping("task")
     public ResponseEntity<ResponseAPI<?>> createNewTask(@RequestBody CreateTaskRequest request) {
-        var data = taskService.createTask(taskControllerMapper.toTaskDto(request));
+        var getUser = authHelper.getUser();
+        var data = taskService.createTask(taskControllerMapper.toTaskDto(request), getUser.getId());
         var formatData = taskControllerMapper.toTaskResponse(data);
         var result = ResponseAPI.builder()
                 .data(formatData)
@@ -51,9 +54,9 @@ public class TaskController {
     }
 
     @GetMapping("task")
-    public ResponseEntity<ResponseAPI<?>> getTaskByTaskId(@RequestParam Integer TaskId) {
+    public ResponseEntity<ResponseAPI<?>> getTaskByTaskId(@RequestParam(value = "taskId") String taskId) {
         var userData = authHelper.getUser();
-        var data = taskService.getTaskById(TaskId, userData.getId());
+        var data = taskService.getTaskById(UUID.fromString(taskId), userData.getId());
         var formatData = taskControllerMapper.toTaskResponse(data);
         var result = ResponseAPI.builder()
                 .data(formatData)
@@ -79,9 +82,9 @@ public class TaskController {
     }
 
     @DeleteMapping("task")
-    public ResponseEntity<ResponseAPI<?>> deleteTask(@RequestParam Integer taskId) {
+    public ResponseEntity<ResponseAPI<?>> deleteTask(@RequestParam String taskId) {
         var userData = authHelper.getUser();
-        var data = taskService.deleteTask(taskId, userData.getId());
+        var data = taskService.deleteTask(UUID.fromString(taskId), userData.getId());
         var formatData = taskControllerMapper.toTaskResponse(data);
         var result = ResponseAPI.builder()
                 .data(formatData)
@@ -92,7 +95,7 @@ public class TaskController {
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
-    
+
     public ResponseEntity<ResponseAPI<?>> assignUserToTask(@RequestBody HandleUserInTaskRequest request) {
         var userData = authHelper.getUser();
         var data = taskService.addUserToTask(taskControllerMapper.toHandleUserDto(request));

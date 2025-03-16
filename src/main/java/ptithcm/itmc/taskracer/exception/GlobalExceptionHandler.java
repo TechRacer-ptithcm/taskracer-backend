@@ -3,11 +3,14 @@ package ptithcm.itmc.taskracer.exception;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import ptithcm.itmc.taskracer.common.web.enumeration.ResponseCode;
 import ptithcm.itmc.taskracer.common.web.response.ErrorObject;
 import ptithcm.itmc.taskracer.common.web.response.ResponseAPI;
+
+import java.util.Objects;
 
 @ControllerAdvice
 @Slf4j
@@ -27,8 +30,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ResponseAPI<?>> handlingResourceNotFound(ResourceNotFound exception) {
         log.error("Resource Exception: {}", (Object) exception.getStackTrace());
         var response = ResponseAPI.<ErrorObject>builder()
-                .code(ResponseCode.USER_NOT_FOUND.getCode())
-                .message(ResponseCode.USER_NOT_FOUND.getMessage())
+                .code(ResponseCode.RESOURCE_NOT_FOUND.getCode())
+                .message(ResponseCode.RESOURCE_NOT_FOUND.getMessage())
                 .status(false)
                 .data(new ErrorObject(exception.getMessage()))
                 .build();
@@ -99,6 +102,18 @@ public class GlobalExceptionHandler {
                 .data(new ErrorObject(exception.getMessage()))
                 .build();
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ResponseAPI<?>> handlingMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
+        exception.getBindingResult().getFieldErrors().forEach(System.out::println);
+        var response = ResponseAPI.<ErrorObject>builder()
+                .code(ResponseCode.VALIDATE_FAILED.getCode())
+                .message(ResponseCode.VALIDATE_FAILED.getMessage())
+                .status(false)
+                .data(new ErrorObject(Objects.requireNonNull(exception.getBindingResult().getFieldError()).getDefaultMessage()))
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
     @ExceptionHandler(Exception.class)

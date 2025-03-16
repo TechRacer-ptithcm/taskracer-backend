@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 public interface UserServiceMapper {
     UserServiceMapper INSTANCE = Mappers.getMapper(UserServiceMapper.class);
 
+    @Mapping(target = "teams", ignore = true)
     @Mapping(target = "tier.id", source = "tier")
     JpaUser toJpaUserDto(UserDto request);
 

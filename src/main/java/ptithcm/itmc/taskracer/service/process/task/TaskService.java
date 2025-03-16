@@ -1,5 +1,6 @@
 package ptithcm.itmc.taskracer.service.process.task;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import ptithcm.itmc.taskracer.repository.JpaUserRepository;
 import ptithcm.itmc.taskracer.service.dto.task.HandleUserDto;
 import ptithcm.itmc.taskracer.service.dto.task.TaskDto;
 import ptithcm.itmc.taskracer.service.mapper.task.TaskMapper;
+import ptithcm.itmc.taskracer.service.mapper.user.UserServiceMapper;
 
 import java.util.List;
 import java.util.UUID;
@@ -21,23 +23,31 @@ public class TaskService {
     private final JpaUserRepository jpaUserRepository;
     private final JpaTaskRepository jpaTaskRepository;
     private final TaskMapper taskMapper;
+    private final UserServiceMapper userServiceMapper;
 
     public List<TaskDto> getAllTask(UUID ownerId) {
         var data = jpaTaskRepository.findByOwnerId(ownerId);
         return taskMapper.toListTaskDto(data);
     }
 
-    public TaskDto getTaskById(Integer id, UUID ownerId) {
+    public TaskDto getTaskById(UUID id, UUID ownerId) {
         var data = jpaTaskRepository.findByIdAndOwnerId(id, ownerId).orElseThrow(() ->
                 new ResourceNotFound("Task not found."));
         return taskMapper.toTaskDto(data);
     }
 
-    public TaskDto createTask(TaskDto taskDto) {
-        var data = jpaTaskRepository.save(taskMapper.toJpaTask(taskDto));
+    @Transactional
+    public TaskDto createTask(TaskDto taskDto, UUID ownerId) {
+        var foundUser = jpaUserRepository.findById(ownerId).orElseThrow(() ->
+                new ResourceNotFound("User not found."));
+        taskDto.setOwner(userServiceMapper.toUserDto(foundUser));
+        var saveData = taskMapper.toJpaTask(taskDto);
+        log.info("create task: {}", saveData);
+        var data = jpaTaskRepository.save(saveData);
         return taskMapper.toTaskDto(data);
     }
 
+    @Transactional
     public TaskDto updateTask(TaskDto taskDto, UUID ownerId) { //Without add user to task
         var foundTask = jpaTaskRepository.findById(taskDto.getId()).orElseThrow(() ->
                 new ResourceNotFound("Task not found."));
@@ -48,7 +58,8 @@ public class TaskService {
         return taskMapper.toTaskDto(data);
     }
 
-    public TaskDto deleteTask(Integer id, UUID ownerId) {
+    @Transactional
+    public TaskDto deleteTask(UUID id, UUID ownerId) {
         var foundTask = jpaTaskRepository.findById(id).orElseThrow(() ->
                 new ResourceNotFound("Task not found."));
         if (foundTask.getOwner().getId().equals(ownerId)) {

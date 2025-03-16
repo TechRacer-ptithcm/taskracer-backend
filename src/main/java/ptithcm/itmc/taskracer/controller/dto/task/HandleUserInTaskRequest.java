@@ -13,5 +13,5 @@ import java.util.UUID;
 @Builder
 public class HandleUserInTaskRequest {
     private UUID userId;
-    private Integer taskId;
+    private UUID taskId;
 }

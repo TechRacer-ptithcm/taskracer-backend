@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface JpaTaskRepository extends JpaRepository<JpaTask, Integer> {
+public interface JpaTaskRepository extends JpaRepository<JpaTask, UUID> {
     List<JpaTask> findByOwnerId(UUID ownerId);
 
-    Optional<JpaTask> findByIdAndOwnerId(Integer id, UUID ownerId);
+    Optional<JpaTask> findByIdAndOwnerId(UUID id, UUID ownerId);
 
     UUID owner(JpaUser owner);
 }

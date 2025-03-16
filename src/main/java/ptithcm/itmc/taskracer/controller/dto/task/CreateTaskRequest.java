@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 import ptithcm.itmc.taskracer.repository.model.enumeration.Priority;
 import ptithcm.itmc.taskracer.repository.model.enumeration.ResourceType;
 import ptithcm.itmc.taskracer.repository.model.enumeration.TaskStatus;
-import ptithcm.itmc.taskracer.service.dto.task.TaskDto;
-import ptithcm.itmc.taskracer.service.dto.user.UserDto;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -18,13 +16,11 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 public class CreateTaskRequest {
-    private TaskDto parent;
+    private UUID parentId;
 
     private ResourceType type;
 
     private UUID resourceId; // user_id or team_id
-
-    private UserDto owner;
 
     private String content;
 

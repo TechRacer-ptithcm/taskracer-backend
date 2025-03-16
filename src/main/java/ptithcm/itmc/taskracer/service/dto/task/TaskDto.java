@@ -18,7 +18,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 public class TaskDto {
-    private Integer id;
+    private UUID id;
 
     private TaskDto parent;
 
@@ -41,5 +41,5 @@ public class TaskDto {
     private TaskStatus status;
 
     private Set<UserDto> users;
-    
+
 }

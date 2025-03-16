@@ -11,5 +11,5 @@ import java.util.UUID;
 @NoArgsConstructor
 public class HandleUserDto {
     private UUID userId;
-    private Integer taskId;
+    private UUID taskId;
 }

@@ -1,6 +1,5 @@
 package ptithcm.itmc.taskracer.controller.dto.task;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,22 +20,14 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TaskResponse {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private UUID id;
 
-    @OneToOne
-    @JoinColumn(name = "parent_id")
     private JpaTask parent;
 
-    @Column(name = "resource_type", nullable = false)
     private ResourceType type;
 
-    @Column(name = "resource_id", nullable = false)
     private UUID resourceId; // user_id or team_id
 
-    @ManyToOne
-    @JoinColumn(name = "owner_id", nullable = false)
     private JpaUser owner;
 
     private String content;
