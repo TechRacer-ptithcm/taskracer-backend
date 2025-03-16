@@ -11,8 +11,10 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import ptithcm.itmc.taskracer.repository.JpaUserRepository;
 import ptithcm.itmc.taskracer.service.dto.user.UserDto;
+import ptithcm.itmc.taskracer.service.mapper.user.UserServiceMapper;
 import ptithcm.itmc.taskracer.util.jwt.CommonUtil;
 
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -24,6 +26,7 @@ public class EmailService {
     private final JavaMailSender javaMailSender;
     private final RedisTemplate<String, Object> redisTemplate;
     private final JpaUserRepository jpaUserRepository;
+    private final UserServiceMapper userServiceMapper;
 
     @Async
     public void sendOtp(UserDto userData) throws MessagingException {
@@ -46,10 +49,11 @@ public class EmailService {
 //        jpaOtpRepository.save(authServiceMapper.toJpaOtp(otp));
     }
 
-    public boolean verifyOtp(String otp) throws Exception {
-        if (!redisTemplate.hasKey("otp:" + otp)) throw new Exception("OTP is not found or already used.");
-        String getUsername = (String) redisTemplate.opsForValue().get("otp:" + otp);
-        redisTemplate.delete("otp:" + otp);
-        return jpaUserRepository.findByUsername(getUsername).isPresent();
+    public Optional<UserDto> getUserFromOtp(String otp) throws Exception {
+        String key = "otp:" + otp;
+        if (!redisTemplate.hasKey(key)) throw new Exception("OTP is not found or already used.");
+        String getUsername = (String) redisTemplate.opsForValue().get(key);
+        var userData = jpaUserRepository.findByUsername(getUsername).orElseThrow(() -> new Exception("User not found."));
+        return Optional.of(userServiceMapper.toUserDto(userData));
     }
 }

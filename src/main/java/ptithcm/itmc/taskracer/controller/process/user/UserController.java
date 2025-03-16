@@ -5,13 +5,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import ptithcm.itmc.taskracer.common.web.enumeration.ResponseCode;
 import ptithcm.itmc.taskracer.common.web.response.ResponseAPI;
-import ptithcm.itmc.taskracer.common.web.response.ResponseMessage;
-import ptithcm.itmc.taskracer.controller.dto.auth.ChangePasswordRequest;
 import ptithcm.itmc.taskracer.controller.mapper.user.UserControllerMapper;
 import ptithcm.itmc.taskracer.helper.AuthHelper;
 import ptithcm.itmc.taskracer.service.process.user.UserService;
@@ -39,18 +39,6 @@ public class UserController {
                 .data(userControllerMapper.toUserResponse(data))
                 .build();
         return ResponseEntity.ok(result);
-    }
-
-    @PostMapping("change-password")
-    public ResponseEntity<ResponseAPI<?>> changePassword(@RequestBody ChangePasswordRequest request) throws Exception {
-        userService.changePassword(request.getToken(), request.getNewPassword());
-        var response = ResponseAPI.builder()
-                .code(ResponseCode.SUCCESS.getCode())
-                .message(ResponseCode.SUCCESS.getMessage())
-                .status(true)
-                .data(new ResponseMessage("Change password successful"))
-                .build();
-        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("users")

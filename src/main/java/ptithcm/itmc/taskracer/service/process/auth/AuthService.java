@@ -103,13 +103,13 @@ public class AuthService {
     }
 
     public OtpForgotPasswordDto VerifyChangePassword(String otp) throws Exception {
-        if (emailService.verifyOtp(otp)) throw new ExpiredException("OTP is not found or already used.");
-        String getUsername = (String) redisTemplate.opsForValue().get("otp:" + otp);
+        String key = "otp:" + otp;
+        var userData = emailService.getUserFromOtp(otp).orElseThrow(() -> new ExpiredException("OTP is not found or already used."));
+        String getUsername = (String) redisTemplate.opsForValue().get(key);
+        log.info(getUsername);
 //        var otpData = jpaOtpRepository.findByOtp(otp)
 //                .filter(object -> object.getExpireAt().isAfter(LocalDateTime.now()))
 //                .orElseThrow(() -> new ExpiredException("OTP is not found or already used."));
-        var userData = jpaUserRepository.findByUsername(getUsername)
-                .orElseThrow(() -> new ResourceNotFound("User not found."));
         var expiredTime = LocalDateTime.now()
                 .plusMinutes(5)
                 .atZone(ZoneId.systemDefault())
@@ -131,5 +131,15 @@ public class AuthService {
                 .or(() -> jpaUserRepository.findByUsername(account))
                 .orElseThrow(() -> new ResourceNotFound("Email or username not found."));
         emailService.sendOtp(userServiceMapper.toUserDto(user));
+    }
+
+    @Transactional
+    public void changePassword(String token, String newPassword) throws Exception {
+        String[] resultData = aesTokenUtil.decrypt(token);
+        var userData = jpaUserRepository.findByUsername(resultData[0])
+                .or(() -> jpaUserRepository.findByEmail(resultData[1]))
+                .orElseThrow(() -> new ResourceNotFound("User not found."));
+        userData.setPassword(passwordEncoder.encode(newPassword));
+        jpaUserRepository.save(userData);
     }
 }

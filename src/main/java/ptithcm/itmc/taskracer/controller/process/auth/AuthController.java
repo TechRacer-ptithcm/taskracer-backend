@@ -113,4 +113,16 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @PostMapping("change-password")
+    public ResponseEntity<ResponseAPI<?>> changePassword(@RequestBody ChangePasswordRequest request) throws Exception {
+        authService.changePassword(request.getToken(), request.getNewPassword());
+        var response = ResponseAPI.builder()
+                .code(ResponseCode.SUCCESS.getCode())
+                .message(ResponseCode.SUCCESS.getMessage())
+                .status(true)
+                .data(new ResponseMessage("Change password successful"))
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
 }

@@ -1,6 +1,5 @@
 package ptithcm.itmc.taskracer.service.process.user;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -44,15 +43,6 @@ public class UserService {
         return userData;
     }
 
-    @Transactional
-    public void changePassword(String token, String newPassword) throws Exception {
-        String[] resultData = aesTokenUtil.decrypt(token);
-        var userData = jpaUserRepository.findByUsername(resultData[0])
-                .or(() -> jpaUserRepository.findByEmail(resultData[1]))
-                .orElseThrow(() -> new ResourceNotFound("User not found."));
-        userData.setPassword(passwordEncoder.encode(newPassword));
-        jpaUserRepository.save(userData);
-    }
 
     public PageableObject<List<UserDto>> getAllUser(Pageable pageable) {
         var data = jpaUserRepository.findAll(pageable);
