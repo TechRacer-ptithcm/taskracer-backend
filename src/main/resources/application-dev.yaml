@@ -1,4 +1,6 @@
 spring:
+  main:
+    web-application-type: servlet
   application:
     name: TaskRacer
   datasource:
@@ -10,7 +12,6 @@ spring:
     hibernate:
       ddl-auto: none
     show-sql: true
-
   h2:
     console:
       enabled: false
@@ -38,6 +39,10 @@ spring:
 server:
   servlet:
     context-path: /api
+  compression:
+    enabled: true
+    mime-types: application/json
+    min-response-size: 2048
 
 jwt:
   secret-key: "b5274918-5bb3-49e1-8ed3-5cbb339d77b8"

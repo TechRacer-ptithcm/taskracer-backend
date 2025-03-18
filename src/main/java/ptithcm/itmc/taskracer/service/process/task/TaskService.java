@@ -26,24 +26,28 @@ public class TaskService {
     private final UserServiceMapper userServiceMapper;
 
     public List<TaskDto> getAllTask(UUID ownerId) {
-        var data = jpaTaskRepository.findByOwnerId(ownerId);
+        var data = jpaTaskRepository.findByOwner(ownerId);
         return taskMapper.toListTaskDto(data);
     }
 
     public TaskDto getTaskById(UUID id, UUID ownerId) {
-        var data = jpaTaskRepository.findByIdAndOwnerId(id, ownerId).orElseThrow(() ->
+        var data = jpaTaskRepository.findByIdAndOwner(id, ownerId).orElseThrow(() ->
                 new ResourceNotFound("Task not found."));
         return taskMapper.toTaskDto(data);
     }
 
     @Transactional
     public TaskDto createTask(TaskDto taskDto, UUID ownerId) {
+        log.info("ownerId: {}", ownerId);
         var foundUser = jpaUserRepository.findById(ownerId).orElseThrow(() ->
                 new ResourceNotFound("User not found."));
-        taskDto.setOwner(userServiceMapper.toUserDto(foundUser));
+        taskDto.setOwner(userServiceMapper.toUserDto(foundUser).getId());
+        if (taskDto.getUsers() == null) {
+            taskDto.setUsers(new java.util.HashSet<>());
+        }
         var saveData = taskMapper.toJpaTask(taskDto);
-        log.info("create task: {}", saveData);
-        var data = jpaTaskRepository.save(saveData);
+        var data = jpaTaskRepository.saveCustom(saveData);
+        log.info("create task: {}", data);
         return taskMapper.toTaskDto(data);
     }
 
@@ -51,7 +55,7 @@ public class TaskService {
     public TaskDto updateTask(TaskDto taskDto, UUID ownerId) { //Without add user to task
         var foundTask = jpaTaskRepository.findById(taskDto.getId()).orElseThrow(() ->
                 new ResourceNotFound("Task not found."));
-        if (!foundTask.getOwner().getId().equals(ownerId)) {
+        if (!foundTask.getOwner().equals(ownerId)) {
             throw new TierInsufficientException("You don't have permission to update this task");
         }
         var data = jpaTaskRepository.save(taskMapper.toJpaTask(taskDto));
@@ -62,7 +66,7 @@ public class TaskService {
     public TaskDto deleteTask(UUID id, UUID ownerId) {
         var foundTask = jpaTaskRepository.findById(id).orElseThrow(() ->
                 new ResourceNotFound("Task not found."));
-        if (foundTask.getOwner().getId().equals(ownerId)) {
+        if (foundTask.getOwner().equals(ownerId)) {
             throw new TierInsufficientException("You don't have permission to delete this task");
         }
         jpaTaskRepository.delete(foundTask);
@@ -70,22 +74,10 @@ public class TaskService {
     }
 
     public TaskDto addUserToTask(HandleUserDto request) {
-        var foundTask = jpaTaskRepository.findById(request.getTaskId()).orElseThrow(() ->
-                new ResourceNotFound("Task not found."));
-        var foundUser = jpaUserRepository.findById(request.getUserId()).orElseThrow(() ->
-                new ResourceNotFound("User not found."));
-        foundTask.getUsers().add(foundUser);
-        var data = jpaTaskRepository.save(foundTask);
-        return taskMapper.toTaskDto(data);
+        return null;
     }
 
     public TaskDto removeUserFromTask(HandleUserDto request) {
-        var foundTask = jpaTaskRepository.findById(request.getTaskId()).orElseThrow(() ->
-                new ResourceNotFound("Task not found."));
-        var foundUser = jpaUserRepository.findById(request.getUserId()).orElseThrow(() ->
-                new ResourceNotFound("User not found."));
-        foundTask.getUsers().remove(foundUser);
-        var data = jpaTaskRepository.save(foundTask);
-        return taskMapper.toTaskDto(data);
+        return null;
     }
 }

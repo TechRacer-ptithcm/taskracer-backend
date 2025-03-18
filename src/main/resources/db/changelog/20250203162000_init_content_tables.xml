@@ -12,7 +12,7 @@
             </column>
             <column name="title" type="VARCHAR(255)"/>
             <column name="parent_id" type="UUID">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
             <column name="description" type="TEXT"/>
             <column name="status" type="VARCHAR(50)">

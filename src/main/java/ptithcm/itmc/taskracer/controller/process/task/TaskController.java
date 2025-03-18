@@ -95,10 +95,22 @@ public class TaskController {
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
-
+    @PostMapping("task/assign-user")
     public ResponseEntity<ResponseAPI<?>> assignUserToTask(@RequestBody HandleUserInTaskRequest request) {
-        var userData = authHelper.getUser();
         var data = taskService.addUserToTask(taskControllerMapper.toHandleUserDto(request));
+        var formatData = taskControllerMapper.toTaskResponse(data);
+        var result = ResponseAPI.builder()
+                .data(formatData)
+                .code(ResponseCode.SUCCESS.getCode())
+                .message(ResponseCode.SUCCESS.getMessage())
+                .status(true)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
+    
+    @PostMapping("task/remove-user")
+    public ResponseEntity<ResponseAPI<?>> removeUserFromTask(@RequestBody HandleUserInTaskRequest request) {
+        var data = taskService.removeUserFromTask(taskControllerMapper.toHandleUserDto(request));
         var formatData = taskControllerMapper.toTaskResponse(data);
         var result = ResponseAPI.builder()
                 .data(formatData)

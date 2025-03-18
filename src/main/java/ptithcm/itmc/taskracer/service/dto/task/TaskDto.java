@@ -20,13 +20,13 @@ import java.util.UUID;
 public class TaskDto {
     private UUID id;
 
-    private TaskDto parent;
+    private UUID parent;
 
     private ResourceType type;
 
     private UUID resourceId; // user_id or team_id
 
-    private UserDto owner;
+    private UUID owner;
 
     private String content;
 

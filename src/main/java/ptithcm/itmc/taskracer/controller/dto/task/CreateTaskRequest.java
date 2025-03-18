@@ -16,7 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 public class CreateTaskRequest {
-    private UUID parentId;
+    private UUID parent;
 
     private ResourceType type;
 

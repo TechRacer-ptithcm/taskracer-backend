@@ -113,7 +113,7 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PostMapping("change-password")
+    @PostMapping("reset-password")
     public ResponseEntity<ResponseAPI<?>> changePassword(@RequestBody ChangePasswordRequest request) throws Exception {
         authService.changePassword(request.getToken(), request.getNewPassword());
         var response = ResponseAPI.builder()

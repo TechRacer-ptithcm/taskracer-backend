@@ -12,10 +12,11 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", uses = {UserServiceMapper.class, TierMapper.class})
 public interface TaskMapper {
-    @Mapping(source = "owner.tier", target = "owner.tier", qualifiedByName = "mapTier")
-    @Mapping(source = "users", target = "users", qualifiedByName = "toSetUsersDto")
+    @Mapping(target = "users", ignore = true)
+    @Mapping(source = "parent.id", target = "parent")
     TaskDto toTaskDto(JpaTask jpaTask);
 
+    @Mapping(source = "parent", target = "parent.id")
     JpaTask toJpaTask(TaskDto taskDto);
 
 

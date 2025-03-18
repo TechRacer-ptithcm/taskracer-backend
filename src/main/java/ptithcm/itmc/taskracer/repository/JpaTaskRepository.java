@@ -9,9 +9,16 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface JpaTaskRepository extends JpaRepository<JpaTask, UUID> {
-    List<JpaTask> findByOwnerId(UUID ownerId);
+    List<JpaTask> findByOwner(UUID ownerId);
 
-    Optional<JpaTask> findByIdAndOwnerId(UUID id, UUID ownerId);
+    Optional<JpaTask> findByIdAndOwner(UUID id, UUID ownerId);
 
     UUID owner(JpaUser owner);
+
+    default JpaTask saveCustom(JpaTask jpaTask) {
+        if (jpaTask.getParent().getId() == null) {
+            jpaTask.setParent(null);
+        }
+        return save(jpaTask);
+    }
 }

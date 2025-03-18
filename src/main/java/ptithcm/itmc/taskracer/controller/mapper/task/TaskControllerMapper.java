@@ -18,7 +18,6 @@ public interface TaskControllerMapper {
     @Mapping(target = "owner", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "users", ignore = true)
-    @Mapping(target = "parent.id", source = "parentId")
     TaskDto toTaskDto(CreateTaskRequest request);
 
     @Mapping(target = "id", ignore = true)

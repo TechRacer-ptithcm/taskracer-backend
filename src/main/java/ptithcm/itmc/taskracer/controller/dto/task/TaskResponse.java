@@ -4,8 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ptithcm.itmc.taskracer.repository.model.JpaTask;
-import ptithcm.itmc.taskracer.repository.model.JpaUser;
 import ptithcm.itmc.taskracer.repository.model.enumeration.Priority;
 import ptithcm.itmc.taskracer.repository.model.enumeration.ResourceType;
 import ptithcm.itmc.taskracer.repository.model.enumeration.TaskStatus;
@@ -22,13 +20,13 @@ import java.util.UUID;
 public class TaskResponse {
     private UUID id;
 
-    private JpaTask parent;
+    private UUID parent;
 
     private ResourceType type;
 
     private UUID resourceId; // user_id or team_id
 
-    private JpaUser owner;
+    private UUID owner;
 
     private String content;
 

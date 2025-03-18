@@ -21,4 +21,8 @@ public interface TierMapper {
             return null;
         return Tier.valueOf(tier.getName().name());
     }
+
+    default JpaTier map(Tier tier) {
+        return new JpaTier(tier.ordinal(), tier, "");
+    }
 }

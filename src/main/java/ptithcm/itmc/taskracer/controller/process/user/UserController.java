@@ -25,7 +25,7 @@ public class UserController {
     private final UserControllerMapper userControllerMapper;
     private final AuthHelper authHelper;
 
-    @GetMapping("user")
+    @GetMapping("user-data")
     @SecurityRequirement(name = "Bearer Authentication")
     public ResponseEntity<ResponseAPI<?>> getUserInfo() {
 //        var principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -50,6 +50,18 @@ public class UserController {
                 .message(ResponseCode.SUCCESS.getMessage())
                 .status(true)
                 .data(data)
+                .build();
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("user")
+    public ResponseEntity<ResponseAPI<?>> getUser(@RequestParam(value = "username") String username) {
+        var data = userService.getUser(username);
+        var result = ResponseAPI.builder()
+                .code(ResponseCode.SUCCESS.getCode())
+                .message(ResponseCode.SUCCESS.getMessage())
+                .status(true)
+                .data(userControllerMapper.toUserResponse(data))
                 .build();
         return ResponseEntity.ok(result);
     }
