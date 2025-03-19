@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ptithcm.itmc.taskracer.common.annotation.ValidateEmail;
+import ptithcm.itmc.taskracer.common.annotation.email.ValidateEmail;
 
 @Builder
 @Data

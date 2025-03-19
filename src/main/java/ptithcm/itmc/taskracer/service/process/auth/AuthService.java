@@ -55,7 +55,7 @@ public class AuthService {
                 .score(0)
                 .name("")
                 .build();
-        var savedUser = jpaUserRepository.save(userServiceMapper.toJpaUserDto(user));
+        var savedUser = jpaUserRepository.save(userServiceMapper.toJpaUser(user));
         emailService.sendOtp(userServiceMapper.toUserDto(savedUser));
         return SignUpResponseDto.builder()
                 .username(savedUser.getUsername())

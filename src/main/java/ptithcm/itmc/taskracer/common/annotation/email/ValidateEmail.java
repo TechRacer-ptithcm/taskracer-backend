@@ -1,4 +1,4 @@
-package ptithcm.itmc.taskracer.common.annotation;
+package ptithcm.itmc.taskracer.common.annotation.email;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

@@ -74,10 +74,10 @@ public class TaskService {
     }
 
     public TaskDto addUserToTask(HandleUserDto request) {
-        return null;
+        return null; //Stage 2
     }
 
     public TaskDto removeUserFromTask(HandleUserDto request) {
-        return null;
+        return null; //Stage 2
     }
 }

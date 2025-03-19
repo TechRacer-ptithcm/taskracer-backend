@@ -18,7 +18,7 @@ public interface UserServiceMapper {
 
     @Mapping(target = "teams", ignore = true)
     @Mapping(target = "tier.id", source = "tier")
-    JpaUser toJpaUserDto(UserDto request);
+    JpaUser toJpaUser(UserDto request);
 
     @Mapping(target = "tier", source = "tier.name")
     UserDto toUserDto(JpaUser request);
