@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ptithcm.itmc.taskracer.exception.ResourceNotFound;
-import ptithcm.itmc.taskracer.exception.TierInsufficientException;
 import ptithcm.itmc.taskracer.repository.JpaTaskRepository;
 import ptithcm.itmc.taskracer.repository.JpaUserRepository;
 import ptithcm.itmc.taskracer.service.dto.task.HandleUserDto;
@@ -14,6 +13,7 @@ import ptithcm.itmc.taskracer.service.mapper.task.TaskMapper;
 import ptithcm.itmc.taskracer.service.mapper.user.UserServiceMapper;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -38,13 +38,10 @@ public class TaskService {
 
     @Transactional
     public TaskDto createTask(TaskDto taskDto, UUID ownerId) {
-        log.info("ownerId: {}", ownerId);
         var foundUser = jpaUserRepository.findById(ownerId).orElseThrow(() ->
                 new ResourceNotFound("User not found."));
         taskDto.setOwner(userServiceMapper.toUserDto(foundUser).getId());
-        if (taskDto.getUsers() == null) {
-            taskDto.setUsers(new java.util.HashSet<>());
-        }
+        taskDto.setResourceId(Optional.ofNullable(taskDto.getResourceId()).orElse(ownerId));
         var saveData = taskMapper.toJpaTask(taskDto);
         var data = jpaTaskRepository.saveCustom(saveData);
         log.info("create task: {}", data);
@@ -52,23 +49,23 @@ public class TaskService {
     }
 
     @Transactional
-    public TaskDto updateTask(TaskDto taskDto, UUID ownerId) { //Without add user to task
-        var foundTask = jpaTaskRepository.findById(taskDto.getId()).orElseThrow(() ->
+    public TaskDto updateTask(TaskDto newTaskData, UUID taskId, UUID ownerId) { //Without add user to task -- for user
+        var foundTask = jpaTaskRepository.findByIdAndOwner(taskId, ownerId).orElseThrow(() ->
                 new ResourceNotFound("Task not found."));
-        if (!foundTask.getOwner().equals(ownerId)) {
-            throw new TierInsufficientException("You don't have permission to update this task");
+        if (newTaskData.getParent() != null) {
+            foundTask.setParent(jpaTaskRepository.findById(newTaskData.getParent()).orElseThrow(() ->
+                    new ResourceNotFound("Parent task not found.")));
         }
-        var data = jpaTaskRepository.save(taskMapper.toJpaTask(taskDto));
+        var saveData = taskMapper.mergeToJpaTask(foundTask, newTaskData);
+        log.info("update task: {}", saveData);
+        var data = jpaTaskRepository.saveCustom(saveData);
         return taskMapper.toTaskDto(data);
     }
 
     @Transactional
     public TaskDto deleteTask(UUID id, UUID ownerId) {
-        var foundTask = jpaTaskRepository.findById(id).orElseThrow(() ->
+        var foundTask = jpaTaskRepository.findByIdAndOwner(id, ownerId).orElseThrow(() ->
                 new ResourceNotFound("Task not found."));
-        if (foundTask.getOwner().equals(ownerId)) {
-            throw new TierInsufficientException("You don't have permission to delete this task");
-        }
         jpaTaskRepository.delete(foundTask);
         return taskMapper.toTaskDto(foundTask);
     }

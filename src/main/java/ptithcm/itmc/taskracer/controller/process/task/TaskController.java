@@ -68,9 +68,9 @@ public class TaskController {
     }
 
     @PutMapping("task")
-    public ResponseEntity<ResponseAPI<?>> updateTask(@RequestBody UpdateTaskRequest request) {
+    public ResponseEntity<ResponseAPI<?>> updateTask(@RequestParam(value = "taskId") String taskId, @RequestBody UpdateTaskRequest request) {
         var userData = authHelper.getUser();
-        var data = taskService.updateTask(taskControllerMapper.toTaskDto(request), userData.getId());
+        var data = taskService.updateTask(taskControllerMapper.toTaskDto(request), UUID.fromString(taskId), userData.getId());
         var formatData = taskControllerMapper.toTaskResponse(data);
         var result = ResponseAPI.builder()
                 .data(formatData)
@@ -82,7 +82,7 @@ public class TaskController {
     }
 
     @DeleteMapping("task")
-    public ResponseEntity<ResponseAPI<?>> deleteTask(@RequestParam String taskId) {
+    public ResponseEntity<ResponseAPI<?>> deleteTask(@RequestParam(value = "taskId") String taskId) {
         var userData = authHelper.getUser();
         var data = taskService.deleteTask(UUID.fromString(taskId), userData.getId());
         var formatData = taskControllerMapper.toTaskResponse(data);
@@ -107,7 +107,7 @@ public class TaskController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
-    
+
     @PostMapping("task/remove-user")
     public ResponseEntity<ResponseAPI<?>> removeUserFromTask(@RequestBody HandleUserInTaskRequest request) {
         var data = taskService.removeUserFromTask(taskControllerMapper.toHandleUserDto(request));

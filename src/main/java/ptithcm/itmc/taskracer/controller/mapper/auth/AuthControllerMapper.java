@@ -1,7 +1,6 @@
 package ptithcm.itmc.taskracer.controller.mapper.auth;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import ptithcm.itmc.taskracer.controller.dto.auth.SignInRequest;
 import ptithcm.itmc.taskracer.controller.dto.auth.SignInResponse;
 import ptithcm.itmc.taskracer.controller.dto.auth.SignUpRequest;
@@ -20,5 +19,6 @@ public interface AuthControllerMapper {
     SignInRequestDto toSignInDto(SignInRequest request);
 
     SignInResponse toSignInResponse(SignInResponseDto response);
+
 
 }

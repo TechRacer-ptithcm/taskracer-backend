@@ -12,13 +12,16 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import ptithcm.itmc.taskracer.common.web.enumeration.ResponseCode;
+import ptithcm.itmc.taskracer.common.web.response.ErrorObject;
+import ptithcm.itmc.taskracer.common.web.response.ResponseAPI;
 import ptithcm.itmc.taskracer.exception.AuthenticationFailedException;
 import ptithcm.itmc.taskracer.service.dto.user.UserDto;
+import ptithcm.itmc.taskracer.service.process.user.UserService;
 import ptithcm.itmc.taskracer.util.jwt.JwtUtil;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -34,6 +37,7 @@ public class JwtFilter extends OncePerRequestFilter {
             "/api/swagger-ui",
             "/api/api-docs"
     );
+    private final UserService userService;
 
     private String extractToken(HttpServletRequest request) {
         String authorizationHeader = request.getHeader("Authorization");
@@ -53,17 +57,16 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     private Optional<UserDto> extractUserFromToken(String token) {
-        Map<String, Object> userDataRaw = jwtUtil.getClaim(token, "data");
-        if (userDataRaw.isEmpty()) {
+        String getUserName = jwtUtil.getClaim(token, "username");
+        if (getUserName.isEmpty()) {
             return Optional.empty();
         }
-        return Optional.ofNullable(objectMapper.convertValue(userDataRaw, UserDto.class));
+        return Optional.ofNullable(userService.getUserDataByUserName(getUserName));
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
-
         String requestUri = request.getRequestURI();
 
         // Bypass các path không cần xác thực
@@ -71,14 +74,13 @@ public class JwtFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-
-        // Lấy token từ header Authorization
-        String token = extractToken(request);
-        if (token == null) {
-            throw new AuthenticationFailedException("Missing Authorization Header");
-        }
-
         try {
+            // Lấy token từ header Authorization
+            String token = extractToken(request);
+            if (token == null) {
+                throw new AuthenticationFailedException("Missing Authorization Header");
+            }
+
             validateToken(token);
 
             // Lấy thông tin user từ token
@@ -103,7 +105,14 @@ public class JwtFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
 
         } catch (Exception e) {
-            throw new AuthenticationFailedException(e.getMessage());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            objectMapper.writeValue(response.getWriter(), ResponseAPI.builder()
+                    .code(ResponseCode.ERROR.getCode())
+                    .message(ResponseCode.ERROR.getMessage())
+                    .status(false)
+                    .data(new ErrorObject(e.getMessage()))
+                    .build());
         }
     }
 }

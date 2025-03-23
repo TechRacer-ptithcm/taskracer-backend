@@ -6,12 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ptithcm.itmc.taskracer.common.web.enumeration.ResponseCode;
 import ptithcm.itmc.taskracer.common.web.response.ResponseAPI;
+import ptithcm.itmc.taskracer.controller.dto.user.UpdateUserRequest;
 import ptithcm.itmc.taskracer.controller.mapper.user.UserControllerMapper;
 import ptithcm.itmc.taskracer.helper.AuthHelper;
 import ptithcm.itmc.taskracer.service.process.user.UserService;
@@ -31,7 +29,8 @@ public class UserController {
 //        var principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 //        var userData = ParseObject.parse(principal, UserDto.class);
 //        var data = userService.getUser(userData.getUsername());
-        var data = authHelper.getUser();
+        var getUserData = authHelper.getUser();
+        var data = userService.getUserDataByUserName(getUserData.getUsername());
         var result = ResponseAPI.builder()
                 .code(ResponseCode.SUCCESS.getCode())
                 .message(ResponseCode.SUCCESS.getMessage())
@@ -56,7 +55,20 @@ public class UserController {
 
     @GetMapping("user")
     public ResponseEntity<ResponseAPI<?>> getUser(@RequestParam(value = "username") String username) {
-        var data = userService.getUser(username);
+        var data = userService.getUserDataByUserName(username);
+        var result = ResponseAPI.builder()
+                .code(ResponseCode.SUCCESS.getCode())
+                .message(ResponseCode.SUCCESS.getMessage())
+                .status(true)
+                .data(userControllerMapper.toUserResponse(data))
+                .build();
+        return ResponseEntity.ok(result);
+    }
+
+    @PutMapping("user")
+    public ResponseEntity<ResponseAPI<?>> updateUser(@RequestBody UpdateUserRequest request) {
+        var userData = authHelper.getUser();
+        var data = userService.editUser(userControllerMapper.toUserDto(request), userData);
         var result = ResponseAPI.builder()
                 .code(ResponseCode.SUCCESS.getCode())
                 .message(ResponseCode.SUCCESS.getMessage())

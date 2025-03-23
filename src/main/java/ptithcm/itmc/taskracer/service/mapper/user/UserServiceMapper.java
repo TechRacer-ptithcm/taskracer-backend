@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
+import org.springframework.util.StringUtils;
 import ptithcm.itmc.taskracer.repository.model.JpaUser;
 import ptithcm.itmc.taskracer.service.dto.user.UserDto;
 
@@ -42,5 +43,17 @@ public interface UserServiceMapper {
                 .collect(Collectors.toSet());
     }
 
+    default UserDto merge(UserDto target, UserDto source) {
+        if (StringUtils.hasText(source.getName())) {
+            target.setName(source.getName());
+        }
+        if (source.getGender() != null) {
+            target.setGender(source.getGender());
+        }
+        if (source.getBirth() != null) {
+            target.setBirth(source.getBirth());
+        }
 
+        return target;
+    }
 }

@@ -2,8 +2,9 @@ package ptithcm.itmc.taskracer.service.process.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import ptithcm.itmc.taskracer.common.web.response.PageableObject;
 import ptithcm.itmc.taskracer.exception.ResourceNotFound;
@@ -11,9 +12,7 @@ import ptithcm.itmc.taskracer.repository.JpaUserRepository;
 import ptithcm.itmc.taskracer.service.dto.user.UserDto;
 import ptithcm.itmc.taskracer.service.mapper.user.UserServiceMapper;
 
-import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -21,21 +20,14 @@ import java.util.concurrent.TimeUnit;
 public class UserService {
     private final JpaUserRepository jpaUserRepository;
     private final UserServiceMapper userServiceMapper;
-    private final RedisTemplate<String, Object> redisTemplate;
 
-    //    @Cacheable(value = "users", key = "T(java.lang.String).format('user:%s:info', #username)", unless = "#username == null")
-    public UserDto getUser(String username) {
-        String key = "users:user:" + username + ":info";
-        if (redisTemplate.opsForValue().get(key) != null) {
-            return (UserDto) redisTemplate.opsForValue().get(key);
-        }
+    @Cacheable(value = "user", key = "#p0")
+    public UserDto getUserDataByUserName(String username) {
         var data = jpaUserRepository.findByUsername(username);
         if (data.isEmpty()) {
             throw new ResourceNotFound("User not found.");
         }
-        var userData = userServiceMapper.toUserDto(data.get());
-        redisTemplate.opsForValue().set(key, userData, 5, TimeUnit.of(ChronoUnit.MINUTES));
-        return userData;
+        return userServiceMapper.toUserDto(data.get());
     }
 
     public PageableObject<List<UserDto>> getAllUser(Pageable pageable) {
@@ -48,12 +40,12 @@ public class UserService {
                 .build();
     }
 
-    public UserDto editUser(UserDto userDto) {
-        var data = jpaUserRepository.findByUsername(userDto.getUsername());
-        if (data.isEmpty()) {
-            throw new ResourceNotFound("User not found.");
-        }
-        var saveData = jpaUserRepository.save(userServiceMapper.toJpaUser(userDto));
+    @CachePut(value = "user", key = "#p1.username")
+    public UserDto editUser(UserDto userData, UserDto ownerDto) {
+        var mergeData = userServiceMapper.merge(ownerDto, userData);
+        log.info("merge data: {}", mergeData);
+        var dataUpdate = userServiceMapper.toJpaUser(mergeData);
+        var saveData = jpaUserRepository.save(dataUpdate);
         return userServiceMapper.toUserDto(saveData);
     }
 }

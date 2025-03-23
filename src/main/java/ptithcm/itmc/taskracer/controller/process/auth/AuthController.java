@@ -45,7 +45,6 @@ public class AuthController {
 
     @PostMapping("sign-in")
     public ResponseEntity<ResponseAPI<?>> signIn(@RequestBody SignInRequest request) {
-        log.info("Sign In: {}", request);
         if (request.getInputAccount().isEmpty() || request.getPassword().isEmpty())
             throw new MissingFieldException("Missing field.");
         var data = authService.signIn(authControllerMapper.toSignInDto(request));

@@ -52,7 +52,7 @@ public class AuthService {
                 .tier(Tier.USER)
                 .active(false)
                 .gender(Gender.MALE)
-                .score(0)
+                .streak(0)
                 .name("")
                 .build();
         var savedUser = jpaUserRepository.save(userServiceMapper.toJpaUser(user));

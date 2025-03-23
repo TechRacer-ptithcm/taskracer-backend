@@ -2,6 +2,8 @@ package ptithcm.itmc.taskracer.repository.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import ptithcm.itmc.taskracer.repository.model.enumeration.Gender;
 
 import java.time.LocalDateTime;
@@ -13,6 +15,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@DynamicUpdate
+@DynamicInsert
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "users", schema = "social")
 public class JpaUser extends Auditable {
@@ -25,7 +29,7 @@ public class JpaUser extends Auditable {
     private JpaTier tier;
 
     @Column(nullable = false)
-    private Integer score;
+    private Integer streak;
 
     @Column(nullable = false, unique = true)
     private String username;

@@ -16,7 +16,7 @@ public interface JpaTaskRepository extends JpaRepository<JpaTask, UUID> {
     UUID owner(JpaUser owner);
 
     default JpaTask saveCustom(JpaTask jpaTask) {
-        if (jpaTask.getParent().getId() == null) {
+        if (jpaTask.getParent() != null && jpaTask.getParent().getId() == null) {
             jpaTask.setParent(null);
         }
         return save(jpaTask);
