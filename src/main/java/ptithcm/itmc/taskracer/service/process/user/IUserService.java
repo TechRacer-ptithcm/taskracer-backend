@@ -14,13 +14,22 @@ import ptithcm.itmc.taskracer.service.mapper.user.UserServiceMapper;
 
 import java.util.List;
 
+public interface IUserService {
+    UserDto getUserDataByUserName(String username);
+
+    PageableObject<List<UserDto>> getAllUser(Pageable pageable);
+
+    UserDto editUser(UserDto userData, UserDto ownerDto);
+}
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserService {
+class UserServiceProcessor implements IUserService {
     private final JpaUserRepository jpaUserRepository;
     private final UserServiceMapper userServiceMapper;
 
+    @Override
     @Cacheable(value = "user", key = "#p0")
     public UserDto getUserDataByUserName(String username) {
         var data = jpaUserRepository.findByUsername(username);
@@ -30,6 +39,7 @@ public class UserService {
         return userServiceMapper.toUserDto(data.get());
     }
 
+    @Override
     public PageableObject<List<UserDto>> getAllUser(Pageable pageable) {
         var data = jpaUserRepository.findAll(pageable);
         return PageableObject.<List<UserDto>>builder()
@@ -40,6 +50,7 @@ public class UserService {
                 .build();
     }
 
+    @Override
     @CachePut(value = "user", key = "#p1.username")
     public UserDto editUser(UserDto userData, UserDto ownerDto) {
         var mergeData = userServiceMapper.merge(ownerDto, userData);

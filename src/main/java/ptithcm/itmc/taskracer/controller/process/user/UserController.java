@@ -12,14 +12,14 @@ import ptithcm.itmc.taskracer.common.web.response.ResponseAPI;
 import ptithcm.itmc.taskracer.controller.dto.user.UpdateUserRequest;
 import ptithcm.itmc.taskracer.controller.mapper.user.UserControllerMapper;
 import ptithcm.itmc.taskracer.helper.AuthHelper;
-import ptithcm.itmc.taskracer.service.process.user.UserService;
+import ptithcm.itmc.taskracer.service.process.user.IUserService;
 
 @RestController
 @RequestMapping("social")
 @RequiredArgsConstructor
 @Slf4j
 public class UserController {
-    private final UserService userService;
+    private final IUserService userService;
     private final UserControllerMapper userControllerMapper;
     private final AuthHelper authHelper;
 

@@ -12,7 +12,7 @@ import ptithcm.itmc.taskracer.controller.dto.task.HandleUserInTaskRequest;
 import ptithcm.itmc.taskracer.controller.dto.task.UpdateTaskRequest;
 import ptithcm.itmc.taskracer.controller.mapper.task.TaskControllerMapper;
 import ptithcm.itmc.taskracer.helper.AuthHelper;
-import ptithcm.itmc.taskracer.service.process.task.TaskService;
+import ptithcm.itmc.taskracer.service.process.task.ITaskService;
 
 import java.util.UUID;
 
@@ -21,7 +21,7 @@ import java.util.UUID;
 @Slf4j
 @RequestMapping("content")
 public class TaskController {
-    private final TaskService taskService;
+    private final ITaskService taskService;
     private final TaskControllerMapper taskControllerMapper;
     private final AuthHelper authHelper;
 

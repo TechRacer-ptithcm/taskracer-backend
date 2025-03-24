@@ -24,21 +24,36 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.concurrent.TimeUnit;
 
+public interface IAuthService {
+    SignUpResponseDto createNewUser(SignUpRequestDto request) throws MessagingException;
+
+    SignInResponseDto signIn(SignInRequestDto request);
+
+    void verifyAccount(String otp);
+
+    void sendOtpForgotPassword(String account) throws MessagingException;
+
+    OtpForgotPasswordDto VerifyChangePassword(String otp) throws Exception;
+
+    void resendOtp(String account) throws MessagingException;
+
+    void changePassword(String token, String newPassword) throws Exception;
+}
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class AuthService {
+class AuthServiceProcessor implements IAuthService {
     private final JpaUserRepository jpaUserRepository;
     private final UserServiceMapper userServiceMapper;
     private final PasswordEncoder passwordEncoder;
     private final TierMapper tierMapper;
     private final JwtUtil jwtUtil;
-    private final EmailService emailService;
-    //    private final JpaOtpRepository jpaOtpRepository;
+    private final IEmailService emailService;
     private final AesTokenUtil aesTokenUtil;
     private final RedisTemplate<String, Object> redisTemplate;
 
-
+    @Override
     @Transactional
     public SignUpResponseDto createNewUser(SignUpRequestDto request) throws MessagingException {
         if (jpaUserRepository.findByUsername(request.getUsername()).isPresent() ||
@@ -64,6 +79,7 @@ public class AuthService {
                 .build();
     }
 
+    @Override
     public SignInResponseDto signIn(SignInRequestDto request) {
         Long expiredTime = TimeUnit.DAYS.toMillis(1);
         var user = jpaUserRepository.findByUsername(request.getInputAccount())
@@ -83,6 +99,7 @@ public class AuthService {
                 .build();
     }
 
+    @Override
     @Transactional
     public void verifyAccount(String otp) {
         String key = "otp:" + otp;
@@ -94,6 +111,7 @@ public class AuthService {
                 .ifPresent(user -> user.setActive(true));
     }
 
+    @Override
     @Transactional
     public void sendOtpForgotPassword(String account) throws MessagingException {
         var user = jpaUserRepository.findByEmail(account)
@@ -102,6 +120,7 @@ public class AuthService {
         emailService.sendOtp(userServiceMapper.toUserDto(user));
     }
 
+    @Override
     public OtpForgotPasswordDto VerifyChangePassword(String otp) throws Exception {
         String key = "otp:" + otp;
         var userData = emailService.getUserFromOtp(otp).orElseThrow(() -> new ExpiredException("OTP is not found or already used."));
@@ -126,6 +145,7 @@ public class AuthService {
     }
 
 
+    @Override
     public void resendOtp(String account) throws MessagingException {
         var user = jpaUserRepository.findByEmail(account)
                 .or(() -> jpaUserRepository.findByUsername(account))
@@ -133,6 +153,7 @@ public class AuthService {
         emailService.sendOtp(userServiceMapper.toUserDto(user));
     }
 
+    @Override
     @Transactional
     public void changePassword(String token, String newPassword) throws Exception {
         String[] resultData = aesTokenUtil.decrypt(token);

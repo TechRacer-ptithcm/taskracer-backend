@@ -16,7 +16,7 @@ import ptithcm.itmc.taskracer.common.web.response.ResponseMessage;
 import ptithcm.itmc.taskracer.controller.dto.auth.*;
 import ptithcm.itmc.taskracer.controller.mapper.auth.AuthControllerMapper;
 import ptithcm.itmc.taskracer.exception.MissingFieldException;
-import ptithcm.itmc.taskracer.service.process.auth.AuthService;
+import ptithcm.itmc.taskracer.service.process.auth.IAuthService;
 
 
 @RestController
@@ -24,7 +24,7 @@ import ptithcm.itmc.taskracer.service.process.auth.AuthService;
 @RequiredArgsConstructor
 @Slf4j
 public class AuthController {
-    private final AuthService authService;
+    private final IAuthService authService;
     private final AuthControllerMapper authControllerMapper;
 
     @PostMapping("sign-up")

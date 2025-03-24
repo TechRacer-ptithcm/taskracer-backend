@@ -16,26 +16,45 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+public interface ITaskService {
+    List<TaskDto> getAllTask(UUID ownerId);
+
+    TaskDto getTaskById(UUID id, UUID ownerId);
+
+    TaskDto createTask(TaskDto taskDto, UUID ownerId);
+
+    TaskDto updateTask(TaskDto newTaskData, UUID taskId, UUID ownerId);
+
+    TaskDto deleteTask(UUID id, UUID ownerId);
+
+    TaskDto addUserToTask(HandleUserDto request);
+
+    TaskDto removeUserFromTask(HandleUserDto request);
+}
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class TaskService {
+class TaskServiceProcessor implements ITaskService {
     private final JpaUserRepository jpaUserRepository;
     private final JpaTaskRepository jpaTaskRepository;
     private final TaskMapper taskMapper;
     private final UserServiceMapper userServiceMapper;
 
+    @Override
     public List<TaskDto> getAllTask(UUID ownerId) {
         var data = jpaTaskRepository.findByOwner(ownerId);
         return taskMapper.toListTaskDto(data);
     }
 
+    @Override
     public TaskDto getTaskById(UUID id, UUID ownerId) {
         var data = jpaTaskRepository.findByIdAndOwner(id, ownerId).orElseThrow(() ->
                 new ResourceNotFound("Task not found."));
         return taskMapper.toTaskDto(data);
     }
 
+    @Override
     @Transactional
     public TaskDto createTask(TaskDto taskDto, UUID ownerId) {
         var foundUser = jpaUserRepository.findById(ownerId).orElseThrow(() ->
@@ -48,6 +67,7 @@ public class TaskService {
         return taskMapper.toTaskDto(data);
     }
 
+    @Override
     @Transactional
     public TaskDto updateTask(TaskDto newTaskData, UUID taskId, UUID ownerId) { //Without add user to task -- for user
         var foundTask = jpaTaskRepository.findByIdAndOwner(taskId, ownerId).orElseThrow(() ->
@@ -62,6 +82,7 @@ public class TaskService {
         return taskMapper.toTaskDto(data);
     }
 
+    @Override
     @Transactional
     public TaskDto deleteTask(UUID id, UUID ownerId) {
         var foundTask = jpaTaskRepository.findByIdAndOwner(id, ownerId).orElseThrow(() ->
@@ -70,10 +91,12 @@ public class TaskService {
         return taskMapper.toTaskDto(foundTask);
     }
 
+    @Override
     public TaskDto addUserToTask(HandleUserDto request) {
         return null; //Stage 2
     }
 
+    @Override
     public TaskDto removeUserFromTask(HandleUserDto request) {
         return null; //Stage 2
     }

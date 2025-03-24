@@ -17,10 +17,16 @@ import ptithcm.itmc.taskracer.util.jwt.CommonUtil;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+public interface IEmailService {
+    void sendOtp(UserDto userData) throws MessagingException;
+
+    Optional<UserDto> getUserFromOtp(String otp) throws Exception;
+}
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class EmailService {
+class EmailServiceProcessor implements IEmailService {
     //    private final JpaOtpRepository jpaOtpRepository;
 //    private final AuthServiceMapper authServiceMapper;
     private final JavaMailSender javaMailSender;
@@ -29,6 +35,7 @@ public class EmailService {
     private final UserServiceMapper userServiceMapper;
 
     @Async
+    @Override
     public void sendOtp(UserDto userData) throws MessagingException {
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -49,6 +56,7 @@ public class EmailService {
 //        jpaOtpRepository.save(authServiceMapper.toJpaOtp(otp));
     }
 
+    @Override
     public Optional<UserDto> getUserFromOtp(String otp) throws Exception {
         String key = "otp:" + otp;
         if (!redisTemplate.hasKey(key)) throw new Exception("OTP is not found or already used.");

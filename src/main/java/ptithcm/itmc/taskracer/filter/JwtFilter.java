@@ -17,7 +17,7 @@ import ptithcm.itmc.taskracer.common.web.response.ErrorObject;
 import ptithcm.itmc.taskracer.common.web.response.ResponseAPI;
 import ptithcm.itmc.taskracer.exception.AuthenticationFailedException;
 import ptithcm.itmc.taskracer.service.dto.user.UserDto;
-import ptithcm.itmc.taskracer.service.process.user.UserService;
+import ptithcm.itmc.taskracer.service.process.user.IUserService;
 import ptithcm.itmc.taskracer.util.jwt.JwtUtil;
 
 import java.io.IOException;
@@ -37,7 +37,7 @@ public class JwtFilter extends OncePerRequestFilter {
             "/api/swagger-ui",
             "/api/api-docs"
     );
-    private final UserService userService;
+    private final IUserService userService;
 
     private String extractToken(HttpServletRequest request) {
         String authorizationHeader = request.getHeader("Authorization");
