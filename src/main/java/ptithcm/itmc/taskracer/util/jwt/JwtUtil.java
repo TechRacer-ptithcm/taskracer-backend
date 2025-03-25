@@ -8,28 +8,29 @@ import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import ptithcm.itmc.taskracer.service.dto.user.UserDto;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.UUID;
 import java.util.function.Function;
 
 @Component
 @Slf4j
 public class JwtUtil {
-    @Value("${jwt.secret-key}")
+    @Value("${task-racer.jwt-secret-key}")
     protected String SECRET_KEY;
 
-    public String generateToken(UserDto user, Long time) {
+    public String generateToken(UUID userId, String username, Long time) {
         return Jwts.builder()
-                .setSubject(user.getId().toString())
-                .claim("username", user.getUsername())
+                .setSubject(userId.toString())
+                .claim("username", username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + time))
                 .signWith(Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8)), SignatureAlgorithm.HS256)
                 .compact();
     }
 
+    @Deprecated
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }

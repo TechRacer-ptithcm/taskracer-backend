@@ -4,6 +4,7 @@ import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -52,6 +53,10 @@ class AuthServiceProcessor implements IAuthService {
     private final IEmailService emailService;
     private final AesTokenUtil aesTokenUtil;
     private final RedisTemplate<String, Object> redisTemplate;
+    @Value("${task-racer.expire.hour}")
+    private int expireTimeByHour;
+    @Value("${task-racer.expire.minute}")
+    private int expireTimeByMinute;
 
     @Override
     @Transactional
@@ -81,7 +86,7 @@ class AuthServiceProcessor implements IAuthService {
 
     @Override
     public SignInResponseDto signIn(SignInRequestDto request) {
-        Long expiredTime = TimeUnit.DAYS.toMillis(1);
+        Long expiredTime = TimeUnit.HOURS.toMillis(expireTimeByHour);
         var user = jpaUserRepository.findByUsername(request.getInputAccount())
                 .or(() -> jpaUserRepository.findByEmail(request.getInputAccount()))
                 .orElseThrow(() -> new ResourceNotFound("User not found."));
@@ -95,7 +100,7 @@ class AuthServiceProcessor implements IAuthService {
                 .email(user.getEmail())
                 .active(user.getActive())
                 .tier(tierMapper.toTierDto(user.getTier()).getName())
-                .accessToken(jwtUtil.generateToken(userServiceMapper.toUserDto(user), expiredTime))
+                .accessToken(jwtUtil.generateToken(user.getId(), user.getUsername(), expiredTime))
                 .build();
     }
 
@@ -126,11 +131,8 @@ class AuthServiceProcessor implements IAuthService {
         var userData = emailService.getUserFromOtp(otp).orElseThrow(() -> new ExpiredException("OTP is not found or already used."));
         String getUsername = (String) redisTemplate.opsForValue().get(key);
         log.info(getUsername);
-//        var otpData = jpaOtpRepository.findByOtp(otp)
-//                .filter(object -> object.getExpireAt().isAfter(LocalDateTime.now()))
-//                .orElseThrow(() -> new ExpiredException("OTP is not found or already used."));
         var expiredTime = LocalDateTime.now()
-                .plusMinutes(5)
+                .plusMinutes(expireTimeByMinute)
                 .atZone(ZoneId.systemDefault())
                 .toInstant()
                 .toEpochMilli();

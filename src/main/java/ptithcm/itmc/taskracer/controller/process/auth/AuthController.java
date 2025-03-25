@@ -1,9 +1,11 @@
 package ptithcm.itmc.taskracer.controller.process.auth;
 
 import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +19,8 @@ import ptithcm.itmc.taskracer.controller.dto.auth.*;
 import ptithcm.itmc.taskracer.controller.mapper.auth.AuthControllerMapper;
 import ptithcm.itmc.taskracer.exception.MissingFieldException;
 import ptithcm.itmc.taskracer.service.process.auth.IAuthService;
+import ptithcm.itmc.taskracer.util.jwt.CookieUtil;
+import ptithcm.itmc.taskracer.util.jwt.JwtUtil;
 
 
 @RestController
@@ -26,6 +30,9 @@ import ptithcm.itmc.taskracer.service.process.auth.IAuthService;
 public class AuthController {
     private final IAuthService authService;
     private final AuthControllerMapper authControllerMapper;
+    private final JwtUtil jwtUtil;
+    @Value("${task-racer.expire.day}")
+    private Integer expireTimeCookieByDay;
 
     @PostMapping("sign-up")
     public ResponseEntity<ResponseAPI<?>> createNewUser(@Valid @RequestBody SignUpRequest request) throws MessagingException {
@@ -44,18 +51,19 @@ public class AuthController {
     }
 
     @PostMapping("sign-in")
-    public ResponseEntity<ResponseAPI<?>> signIn(@RequestBody SignInRequest request) {
+    public ResponseEntity<ResponseAPI<?>> signIn(@RequestBody SignInRequest request, HttpServletResponse response) {
         if (request.getInputAccount().isEmpty() || request.getPassword().isEmpty())
             throw new MissingFieldException("Missing field.");
         var data = authService.signIn(authControllerMapper.toSignInDto(request));
         var result = authControllerMapper.toSignInResponse(data);
-        var response = ResponseAPI.<SignInResponse>builder()
+        var resp = ResponseAPI.<SignInResponse>builder()
                 .code(ResponseCode.SUCCESS.getCode())
                 .message(ResponseCode.SUCCESS.getMessage())
                 .status(true)
                 .data(result)
                 .build();
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        CookieUtil.addRefreshTokenCookie(response, jwtUtil, data.getId(), data.getUsername(), expireTimeCookieByDay);
+        return ResponseEntity.status(HttpStatus.OK).body(resp);
     }
 
     @PostMapping("verify-account")
