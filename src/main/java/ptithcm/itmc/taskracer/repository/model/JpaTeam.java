@@ -32,7 +32,7 @@ public class JpaTeam extends Auditable {
     @Column(nullable = false)
     private Visibility visibility;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(name = "team_members",
             schema = "social",
             joinColumns = @JoinColumn(name = "team_id"),

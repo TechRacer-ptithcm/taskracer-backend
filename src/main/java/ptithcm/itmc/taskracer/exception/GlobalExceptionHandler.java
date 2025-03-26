@@ -10,7 +10,6 @@ import ptithcm.itmc.taskracer.common.web.enumeration.ResponseCode;
 import ptithcm.itmc.taskracer.common.web.response.ErrorObject;
 import ptithcm.itmc.taskracer.common.web.response.ResponseAPI;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 @ControllerAdvice
@@ -123,7 +122,7 @@ public class GlobalExceptionHandler {
                 .code(ResponseCode.ERROR.getCode())
                 .message(ResponseCode.ERROR.getMessage())
                 .status(false)
-                .data(new ErrorObject(Arrays.toString(exception.getStackTrace())))
+                .data(new ErrorObject(exception.getMessage()))
                 .build();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }

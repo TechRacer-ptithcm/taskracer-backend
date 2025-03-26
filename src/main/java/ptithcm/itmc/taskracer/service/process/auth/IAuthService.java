@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import ptithcm.itmc.taskracer.exception.DuplicateDataException;
 import ptithcm.itmc.taskracer.exception.ExpiredException;
 import ptithcm.itmc.taskracer.exception.ResourceNotFound;
+import ptithcm.itmc.taskracer.exception.ValidationFailedException;
 import ptithcm.itmc.taskracer.repository.JpaUserRepository;
 import ptithcm.itmc.taskracer.repository.model.enumeration.Gender;
 import ptithcm.itmc.taskracer.repository.model.enumeration.Tier;
@@ -39,6 +40,8 @@ public interface IAuthService {
     void resendOtp(String account) throws MessagingException;
 
     void changePassword(String token, String newPassword) throws Exception;
+
+    String refreshAccessToken(String token);
 }
 
 @Service
@@ -164,5 +167,15 @@ class AuthServiceProcessor implements IAuthService {
                 .orElseThrow(() -> new ResourceNotFound("User not found."));
         userData.setPassword(passwordEncoder.encode(newPassword));
         jpaUserRepository.save(userData);
+    }
+
+    @Override
+    public String refreshAccessToken(String token) {
+        if (!jwtUtil.validateToken(token)) {
+            throw new ValidationFailedException("Invalid refresh token.");
+        }
+        var username = jwtUtil.getClaim(token, "username");
+        var userData = jpaUserRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFound("User not found."));
+        return jwtUtil.generateToken(userData.getId(), username, TimeUnit.HOURS.toMillis(expireTimeByHour));
     }
 }

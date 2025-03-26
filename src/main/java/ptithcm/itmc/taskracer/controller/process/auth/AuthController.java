@@ -1,6 +1,7 @@
 package ptithcm.itmc.taskracer.controller.process.auth;
 
 import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import ptithcm.itmc.taskracer.common.web.response.ResponseMessage;
 import ptithcm.itmc.taskracer.controller.dto.auth.*;
 import ptithcm.itmc.taskracer.controller.mapper.auth.AuthControllerMapper;
 import ptithcm.itmc.taskracer.exception.MissingFieldException;
+import ptithcm.itmc.taskracer.exception.ResourceNotFound;
 import ptithcm.itmc.taskracer.service.process.auth.IAuthService;
 import ptithcm.itmc.taskracer.util.jwt.CookieUtil;
 import ptithcm.itmc.taskracer.util.jwt.JwtUtil;
@@ -132,4 +134,19 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @PostMapping("refresh")
+    public ResponseEntity<ResponseAPI<?>> refreshAccessToken(HttpServletRequest request) {
+        var refreshToken = CookieUtil.getCookieValue(request, "refresh_token")
+                .orElseThrow(() -> new ResourceNotFound("Refresh token not found."));
+        var data = authService.refreshAccessToken(refreshToken);
+        var response = ResponseAPI.builder()
+                .code(ResponseCode.SUCCESS.getCode())
+                .message(ResponseCode.SUCCESS.getMessage())
+                .status(true)
+                .data(RefreshAccessTokenResponse.builder()
+                        .accessToken(data)
+                        .build())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 }

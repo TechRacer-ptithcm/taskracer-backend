@@ -3,6 +3,7 @@ package ptithcm.itmc.taskracer.controller.process.team;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ptithcm.itmc.taskracer.common.web.response.ResponseAPI;
 import ptithcm.itmc.taskracer.service.process.team.ITeamService;
 
 @RestController
@@ -12,52 +13,52 @@ public class TeamController {
     private final ITeamService teamService;
 
     @GetMapping("team/{id}")
-    public ResponseEntity<?> getTeamById(@PathVariable String id) {
+    public ResponseEntity<ResponseAPI<?>> getTeamById(@PathVariable String id) {
         return null;
     }
 
     @GetMapping("teams")
-    public ResponseEntity<?> getAllTeam() {
+    public ResponseEntity<ResponseAPI<?>> getAllTeam() {
         return null;
     }
 
     @PostMapping("team")
-    public ResponseEntity<?> createTeam() {
+    public ResponseEntity<ResponseAPI<?>> createTeam() {
         return null;
     }
 
     @PutMapping("team/{id}")
-    public ResponseEntity<?> updateTeam(@PathVariable String id) {
+    public ResponseEntity<ResponseAPI<?>> updateTeam(@PathVariable String id) {
         return null;
     }
 
     @DeleteMapping("team/{id}")
-    public ResponseEntity<?> deleteTeam(@PathVariable String id) {
+    public ResponseEntity<ResponseAPI<?>> deleteTeam(@PathVariable String id) {
         return null;
     }
 
     @PostMapping("team/remove/{id}")
-    public ResponseEntity<?> removeUserFromTeam(@PathVariable String id) {
+    public ResponseEntity<ResponseAPI<?>> removeUserFromTeam(@PathVariable String id) {
         return null;
     }
 
     @PostMapping("team/invite/{id}")
-    public ResponseEntity<?> addUserToTeam(@PathVariable String id) {
+    public ResponseEntity<ResponseAPI<?>> addUserToTeam(@PathVariable String id) {
         return null;
     }
 
     @PostMapping("team/ask/{id}")
-    public ResponseEntity<?> addTaskToTeam(@PathVariable String id) {
+    public ResponseEntity<ResponseAPI<?>> addTaskToTeam(@PathVariable String id) {
         return null;
     }
 
     @PostMapping("team/accept/{id}")
-    public ResponseEntity<?> acceptTaskToTeam(@PathVariable String id) {
+    public ResponseEntity<ResponseAPI<?>> acceptTaskToTeam(@PathVariable String id) {
         return null;
     }
 
     @PostMapping("team/reject/{id}")
-    public ResponseEntity<?> rejectTaskToTeam(@PathVariable String id) {
+    public ResponseEntity<ResponseAPI<?>> rejectTaskToTeam(@PathVariable String id) {
         return null;
     }
 }
