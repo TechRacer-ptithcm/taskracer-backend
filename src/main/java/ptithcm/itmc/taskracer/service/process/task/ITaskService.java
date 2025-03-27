@@ -44,14 +44,14 @@ class TaskServiceProcessor implements ITaskService {
     @Override
     public List<TaskDto> getAllTask(UUID ownerId) {
         var data = jpaTaskRepository.findByOwner(ownerId);
-        return taskMapper.toListTaskDto(data);
+        return taskMapper.toDto(data);
     }
 
     @Override
     public TaskDto getTaskById(UUID id, UUID ownerId) {
         var data = jpaTaskRepository.findByIdAndOwner(id, ownerId).orElseThrow(() ->
                 new ResourceNotFound("Task not found."));
-        return taskMapper.toTaskDto(data);
+        return taskMapper.toDto(data);
     }
 
     @Override
@@ -59,12 +59,12 @@ class TaskServiceProcessor implements ITaskService {
     public TaskDto createTask(TaskDto taskDto, UUID ownerId) {
         var foundUser = jpaUserRepository.findById(ownerId).orElseThrow(() ->
                 new ResourceNotFound("User not found."));
-        taskDto.setOwner(userServiceMapper.toUserDto(foundUser).getId());
+        taskDto.setOwner(userServiceMapper.toDto(foundUser).getId());
         taskDto.setResourceId(Optional.ofNullable(taskDto.getResourceId()).orElse(ownerId));
-        var saveData = taskMapper.toJpaTask(taskDto);
+        var saveData = taskMapper.toJpa(taskDto);
         var data = jpaTaskRepository.saveCustom(saveData);
         log.info("create task: {}", data);
-        return taskMapper.toTaskDto(data);
+        return taskMapper.toDto(data);
     }
 
     @Override
@@ -76,10 +76,10 @@ class TaskServiceProcessor implements ITaskService {
             foundTask.setParent(jpaTaskRepository.findById(newTaskData.getParent()).orElseThrow(() ->
                     new ResourceNotFound("Parent task not found.")));
         }
-        var saveData = taskMapper.mergeToJpaTask(foundTask, newTaskData);
+        var saveData = taskMapper.merge(foundTask, newTaskData);
         log.info("update task: {}", saveData);
         var data = jpaTaskRepository.saveCustom(saveData);
-        return taskMapper.toTaskDto(data);
+        return taskMapper.toDto(data);
     }
 
     @Override
@@ -88,7 +88,7 @@ class TaskServiceProcessor implements ITaskService {
         var foundTask = jpaTaskRepository.findByIdAndOwner(id, ownerId).orElseThrow(() ->
                 new ResourceNotFound("Task not found."));
         jpaTaskRepository.delete(foundTask);
-        return taskMapper.toTaskDto(foundTask);
+        return taskMapper.toDto(foundTask);
     }
 
     @Override

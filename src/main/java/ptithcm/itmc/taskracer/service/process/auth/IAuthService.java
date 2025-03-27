@@ -31,7 +31,7 @@ public interface IAuthService {
 
     SignInResponseDto signIn(SignInRequestDto request);
 
-    void verifyAccount(String otp);
+    VerifyAccountDto verifyAccount(String otp);
 
     void sendOtpForgotPassword(String account) throws MessagingException;
 
@@ -78,8 +78,8 @@ class AuthServiceProcessor implements IAuthService {
                 .streak(0)
                 .name("")
                 .build();
-        var savedUser = jpaUserRepository.save(userServiceMapper.toJpaUser(user));
-        emailService.sendOtp(userServiceMapper.toUserDto(savedUser));
+        var savedUser = jpaUserRepository.save(userServiceMapper.toJpa(user));
+        emailService.sendOtp(userServiceMapper.toDto(savedUser));
         return SignUpResponseDto.builder()
                 .username(savedUser.getUsername())
                 .email(savedUser.getEmail())
@@ -102,21 +102,27 @@ class AuthServiceProcessor implements IAuthService {
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .active(user.getActive())
-                .tier(tierMapper.toTierDto(user.getTier()).getName())
+                .tier(tierMapper.toDto(user.getTier()).getName())
                 .accessToken(jwtUtil.generateToken(user.getId(), user.getUsername(), expiredTime))
                 .build();
     }
 
     @Override
     @Transactional
-    public void verifyAccount(String otp) {
+    public VerifyAccountDto verifyAccount(String otp) {
+        Long expiredTime = TimeUnit.HOURS.toMillis(expireTimeByHour);
         String key = "otp:" + otp;
         if (!redisTemplate.hasKey(key)) throw new ExpiredException("OTP is not found or already used.");
         String getUsername = (String) (redisTemplate.opsForValue().get(key));
         log.info("otp get username: {}", getUsername);
         redisTemplate.delete(key);
-        jpaUserRepository.findByUsername(getUsername)
-                .ifPresent(user -> user.setActive(true));
+        var userData = jpaUserRepository.findByUsername(getUsername);
+        if (userData.isEmpty()) throw new ResourceNotFound("User not found.");
+        userData.ifPresent(jpaUser -> jpaUser.setActive(true));
+        return VerifyAccountDto.builder()
+                .message("Verify account successfully.")
+                .accessToken(jwtUtil.generateToken(userData.get().getId(), getUsername, expiredTime))
+                .build();
     }
 
     @Override
@@ -125,7 +131,7 @@ class AuthServiceProcessor implements IAuthService {
         var user = jpaUserRepository.findByEmail(account)
                 .or(() -> jpaUserRepository.findByUsername(account))
                 .orElseThrow(() -> new ResourceNotFound("Email or username not found."));
-        emailService.sendOtp(userServiceMapper.toUserDto(user));
+        emailService.sendOtp(userServiceMapper.toDto(user));
     }
 
     @Override
@@ -155,7 +161,7 @@ class AuthServiceProcessor implements IAuthService {
         var user = jpaUserRepository.findByEmail(account)
                 .or(() -> jpaUserRepository.findByUsername(account))
                 .orElseThrow(() -> new ResourceNotFound("Email or username not found."));
-        emailService.sendOtp(userServiceMapper.toUserDto(user));
+        emailService.sendOtp(userServiceMapper.toDto(user));
     }
 
     @Override

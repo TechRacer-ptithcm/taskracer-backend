@@ -35,7 +35,7 @@ public class UserController {
                 .code(ResponseCode.SUCCESS.getCode())
                 .message(ResponseCode.SUCCESS.getMessage())
                 .status(true)
-                .data(userControllerMapper.toUserResponse(data))
+                .data(userControllerMapper.toDomain(data))
                 .build();
         return ResponseEntity.ok(result);
     }
@@ -60,7 +60,7 @@ public class UserController {
                 .code(ResponseCode.SUCCESS.getCode())
                 .message(ResponseCode.SUCCESS.getMessage())
                 .status(true)
-                .data(userControllerMapper.toUserResponse(data))
+                .data(userControllerMapper.toDomain(data))
                 .build();
         return ResponseEntity.ok(result);
     }
@@ -68,13 +68,18 @@ public class UserController {
     @PutMapping("user")
     public ResponseEntity<ResponseAPI<?>> updateUser(@RequestBody UpdateUserRequest request) {
         var userData = authHelper.getUser();
-        var data = userService.editUser(userControllerMapper.toUserDto(request), userData);
+        var data = userService.editUser(userControllerMapper.toDto(request), userData);
         var result = ResponseAPI.builder()
                 .code(ResponseCode.SUCCESS.getCode())
                 .message(ResponseCode.SUCCESS.getMessage())
                 .status(true)
-                .data(userControllerMapper.toUserResponse(data))
+                .data(userControllerMapper.toDomain(data))
                 .build();
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("dashboard")
+    public ResponseEntity<ResponseAPI<?>> getDashboard() {
+        return null;
     }
 }

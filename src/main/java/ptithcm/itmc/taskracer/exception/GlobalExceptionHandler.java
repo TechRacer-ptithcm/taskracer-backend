@@ -123,6 +123,7 @@ public class GlobalExceptionHandler {
                 .message(ResponseCode.ERROR.getMessage())
                 .status(false)
                 .data(new ErrorObject(exception.getMessage()))
+                .stackTrace(exception.getStackTrace())
                 .build();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }

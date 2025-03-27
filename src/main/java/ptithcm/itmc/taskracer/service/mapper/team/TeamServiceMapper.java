@@ -27,8 +27,8 @@ public interface TeamServiceMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "deletedAt", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
-    JpaTeam toJpaTeam(TeamDto data);
+    JpaTeam toJpa(TeamDto data);
 
     @Mapping(target = "ownerId", source = "userId")
-    TeamDto toTeamDto(JpaTeam data);
+    TeamDto toDto(JpaTeam data);
 }

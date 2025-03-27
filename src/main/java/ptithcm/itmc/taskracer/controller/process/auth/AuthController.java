@@ -41,8 +41,8 @@ public class AuthController {
         log.info("Create new user: {}", request);
         if (request.getUsername().isEmpty() || request.getPassword().isEmpty() || request.getEmail().isEmpty())
             throw new MissingFieldException("Missing field.");
-        var data = authService.createNewUser(authControllerMapper.toSignUpDto(request));
-        var result = authControllerMapper.toSignUpResponse(data);
+        var data = authService.createNewUser(authControllerMapper.toDto(request));
+        var result = authControllerMapper.toDomain(data);
         var response = ResponseAPI.<SignUpResponse>builder()
                 .code(ResponseCode.SUCCESS.getCode())
                 .message(ResponseCode.SUCCESS.getMessage())
@@ -56,8 +56,8 @@ public class AuthController {
     public ResponseEntity<ResponseAPI<?>> signIn(@RequestBody SignInRequest request, HttpServletResponse response) {
         if (request.getInputAccount().isEmpty() || request.getPassword().isEmpty())
             throw new MissingFieldException("Missing field.");
-        var data = authService.signIn(authControllerMapper.toSignInDto(request));
-        var result = authControllerMapper.toSignInResponse(data);
+        var data = authService.signIn(authControllerMapper.toDto(request));
+        var result = authControllerMapper.toDomain(data);
         var resp = ResponseAPI.<SignInResponse>builder()
                 .code(ResponseCode.SUCCESS.getCode())
                 .message(ResponseCode.SUCCESS.getMessage())
@@ -72,12 +72,13 @@ public class AuthController {
     public ResponseEntity<ResponseAPI<?>> verifyAccount(@RequestBody VerifyAccountRequest request) {
 //        var principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 //        var userData = ParseObject.parse(principal, UserDto.class);
-        authService.verifyAccount(request.getOtp());
+        var data = authService.verifyAccount(request.getOtp());
+        var returnData = authControllerMapper.toDomain(data);
         var response = ResponseAPI.builder()
                 .code(ResponseCode.SUCCESS.getCode())
                 .message(ResponseCode.SUCCESS.getMessage())
                 .status(true)
-                .data(new ResponseMessage("Active account successful"))
+                .data(returnData)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

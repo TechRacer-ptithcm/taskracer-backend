@@ -15,23 +15,23 @@ import java.util.List;
 public interface TaskMapper {
     @Mapping(target = "users", ignore = true)
     @Mapping(source = "parent.id", target = "parent")
-    TaskDto toTaskDto(JpaTask jpaTask);
+    TaskDto toDto(JpaTask jpaTask);
 
     @Mapping(source = "parent", target = "parent.id")
-    JpaTask toJpaTask(TaskDto taskDto);
+    JpaTask toJpa(TaskDto taskDto);
 
 
-    default List<TaskDto> toListTaskDto(List<JpaTask> jpaTasks) {
+    default List<TaskDto> toDto(List<JpaTask> jpaTasks) {
         if (jpaTasks.isEmpty()) {
             return Collections.emptyList();
         }
         return jpaTasks
                 .stream()
-                .map(this::toTaskDto)
+                .map(this::toDto)
                 .toList();
     }
 
-    default JpaTask mergeToJpaTask(JpaTask jpaTask, TaskDto taskDto) {
+    default JpaTask merge(JpaTask jpaTask, TaskDto taskDto) {
         if (taskDto.getParent() != null && !taskDto.getParent().equals(jpaTask.getId())) {
             jpaTask.setParent(JpaTask.builder().id(taskDto.getParent()).build());
         }

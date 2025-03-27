@@ -36,14 +36,14 @@ class UserServiceProcessor implements IUserService {
         if (data.isEmpty()) {
             throw new ResourceNotFound("User not found.");
         }
-        return userServiceMapper.toUserDto(data.get());
+        return userServiceMapper.toDto(data.get());
     }
 
     @Override
     public PageableObject<List<UserDto>> getAllUser(Pageable pageable) {
         var data = jpaUserRepository.findAll(pageable);
         return PageableObject.<List<UserDto>>builder()
-                .content(userServiceMapper.toListUserDto(data.getContent()))
+                .content(userServiceMapper.toDto(data.getContent()))
                 .totalElements(data.getTotalElements())
                 .totalPage(data.getTotalPages())
                 .currentPage(data.getNumber())
@@ -55,8 +55,8 @@ class UserServiceProcessor implements IUserService {
     public UserDto editUser(UserDto userData, UserDto ownerDto) {
         var mergeData = userServiceMapper.merge(ownerDto, userData);
         log.info("merge data: {}", mergeData);
-        var dataUpdate = userServiceMapper.toJpaUser(mergeData);
+        var dataUpdate = userServiceMapper.toJpa(mergeData);
         var saveData = jpaUserRepository.save(dataUpdate);
-        return userServiceMapper.toUserDto(saveData);
+        return userServiceMapper.toDto(saveData);
     }
 }

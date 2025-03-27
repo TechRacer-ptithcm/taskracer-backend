@@ -54,8 +54,8 @@ class TeamServiceProcessor implements ITeamService {
         }
         teamDto.setOwnerId(ownerId);
         teamDto.getUsers().add(ownerId);
-        var data = jpaTeamRepository.save(teamServiceMapper.toJpaTeam(teamDto));
-        return teamServiceMapper.toTeamDto(data);
+        var data = jpaTeamRepository.save(teamServiceMapper.toJpa(teamDto));
+        return teamServiceMapper.toDto(data);
     }
 
     @Override

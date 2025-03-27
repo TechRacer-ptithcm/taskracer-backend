@@ -28,8 +28,8 @@ public class TaskController {
     @PostMapping("task")
     public ResponseEntity<ResponseAPI<?>> createNewTask(@RequestBody CreateTaskRequest request) {
         var getUser = authHelper.getUser();
-        var data = taskService.createTask(taskControllerMapper.toTaskDto(request), getUser.getId());
-        var formatData = taskControllerMapper.toTaskResponse(data);
+        var data = taskService.createTask(taskControllerMapper.toDto(request), getUser.getId());
+        var formatData = taskControllerMapper.toDomain(data);
         var result = ResponseAPI.builder()
                 .data(formatData)
                 .code(ResponseCode.SUCCESS.getCode())
@@ -43,7 +43,7 @@ public class TaskController {
     public ResponseEntity<ResponseAPI<?>> getAllTasksThrowUserId() {
         var userData = authHelper.getUser();
         var data = taskService.getAllTask(userData.getId());
-        var formatData = taskControllerMapper.toListTaskResponse(data);
+        var formatData = taskControllerMapper.toDomain(data);
         var result = ResponseAPI.builder()
                 .data(formatData)
                 .code(ResponseCode.SUCCESS.getCode())
@@ -57,7 +57,7 @@ public class TaskController {
     public ResponseEntity<ResponseAPI<?>> getTaskByTaskId(@RequestParam(value = "taskId") String taskId) {
         var userData = authHelper.getUser();
         var data = taskService.getTaskById(UUID.fromString(taskId), userData.getId());
-        var formatData = taskControllerMapper.toTaskResponse(data);
+        var formatData = taskControllerMapper.toDomain(data);
         var result = ResponseAPI.builder()
                 .data(formatData)
                 .code(ResponseCode.SUCCESS.getCode())
@@ -70,8 +70,8 @@ public class TaskController {
     @PutMapping("task")
     public ResponseEntity<ResponseAPI<?>> updateTask(@RequestParam(value = "taskId") String taskId, @RequestBody UpdateTaskRequest request) {
         var userData = authHelper.getUser();
-        var data = taskService.updateTask(taskControllerMapper.toTaskDto(request), UUID.fromString(taskId), userData.getId());
-        var formatData = taskControllerMapper.toTaskResponse(data);
+        var data = taskService.updateTask(taskControllerMapper.toDto(request), UUID.fromString(taskId), userData.getId());
+        var formatData = taskControllerMapper.toDomain(data);
         var result = ResponseAPI.builder()
                 .data(formatData)
                 .code(ResponseCode.SUCCESS.getCode())
@@ -85,7 +85,7 @@ public class TaskController {
     public ResponseEntity<ResponseAPI<?>> deleteTask(@RequestParam(value = "taskId") String taskId) {
         var userData = authHelper.getUser();
         var data = taskService.deleteTask(UUID.fromString(taskId), userData.getId());
-        var formatData = taskControllerMapper.toTaskResponse(data);
+        var formatData = taskControllerMapper.toDomain(data);
         var result = ResponseAPI.builder()
                 .data(formatData)
                 .code(ResponseCode.SUCCESS.getCode())
@@ -97,8 +97,8 @@ public class TaskController {
 
     @PostMapping("task/assign-user")
     public ResponseEntity<ResponseAPI<?>> assignUserToTask(@RequestBody HandleUserInTaskRequest request) {
-        var data = taskService.addUserToTask(taskControllerMapper.toHandleUserDto(request));
-        var formatData = taskControllerMapper.toTaskResponse(data);
+        var data = taskService.addUserToTask(taskControllerMapper.toDto(request));
+        var formatData = taskControllerMapper.toDomain(data);
         var result = ResponseAPI.builder()
                 .data(formatData)
                 .code(ResponseCode.SUCCESS.getCode())
@@ -110,8 +110,8 @@ public class TaskController {
 
     @PostMapping("task/remove-user")
     public ResponseEntity<ResponseAPI<?>> removeUserFromTask(@RequestBody HandleUserInTaskRequest request) {
-        var data = taskService.removeUserFromTask(taskControllerMapper.toHandleUserDto(request));
-        var formatData = taskControllerMapper.toTaskResponse(data);
+        var data = taskService.removeUserFromTask(taskControllerMapper.toDto(request));
+        var formatData = taskControllerMapper.toDomain(data);
         var result = ResponseAPI.builder()
                 .data(formatData)
                 .code(ResponseCode.SUCCESS.getCode())

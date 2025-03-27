@@ -8,8 +8,14 @@ import ptithcm.itmc.taskracer.service.dto.user.UserDto;
 
 @Mapper(componentModel = "spring")
 public interface UserControllerMapper {
-    UserResponse toUserResponse(UserDto request);
+    UserResponse toDomain(UserDto request);
 
+    @Mapping(target = "username", ignore = true)
+    @Mapping(target = "tier", ignore = true)
+    @Mapping(target = "streak", ignore = true)
+    @Mapping(target = "password", ignore = true)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "email", ignore = true)
     @Mapping(target = "active", ignore = true)
-    UserDto toUserDto(UpdateUserRequest request);
+    UserDto toDto(UpdateUserRequest request);
 }

@@ -62,6 +62,6 @@ class EmailServiceProcessor implements IEmailService {
         if (!redisTemplate.hasKey(key)) throw new Exception("OTP is not found or already used.");
         String getUsername = (String) redisTemplate.opsForValue().get(key);
         var userData = jpaUserRepository.findByUsername(getUsername).orElseThrow(() -> new Exception("User not found."));
-        return Optional.of(userServiceMapper.toUserDto(userData));
+        return Optional.of(userServiceMapper.toDto(userData));
     }
 }

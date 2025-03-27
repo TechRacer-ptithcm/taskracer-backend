@@ -19,17 +19,17 @@ public interface UserServiceMapper {
 
     @Mapping(target = "teams", ignore = true)
     @Mapping(target = "tier.id", source = "tier")
-    JpaUser toJpaUser(UserDto request);
+    JpaUser toJpa(UserDto request);
 
     @Mapping(target = "tier", source = "tier.name")
-    UserDto toUserDto(JpaUser request);
+    UserDto toDto(JpaUser request);
 
-    default List<UserDto> toListUserDto(List<JpaUser> request) {
+    default List<UserDto> toDto(List<JpaUser> request) {
         if (request.isEmpty()) {
             return Collections.emptyList();
         }
         return request.stream()
-                .map(this::toUserDto)
+                .map(this::toDto)
                 .toList();
     }
 
@@ -39,7 +39,7 @@ public interface UserServiceMapper {
             return Collections.emptySet();
         }
         return request.stream()
-                .map(this::toUserDto)
+                .map(this::toDto)
                 .collect(Collectors.toSet());
     }
 
