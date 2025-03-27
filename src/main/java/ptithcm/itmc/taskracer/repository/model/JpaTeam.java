@@ -27,7 +27,7 @@ public class JpaTeam extends Auditable {
 
     @ManyToOne
     @JoinColumn(name = "owner", nullable = false)
-    private JpaUser userId;
+    private JpaUser owner;
 
     @Column(nullable = false)
     private Visibility visibility;

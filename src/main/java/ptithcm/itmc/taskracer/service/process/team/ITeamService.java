@@ -2,9 +2,15 @@ package ptithcm.itmc.taskracer.service.process.team;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import ptithcm.itmc.taskracer.common.web.response.PageableObject;
 import ptithcm.itmc.taskracer.exception.DuplicateDataException;
+import ptithcm.itmc.taskracer.exception.ResourceNotFound;
+import ptithcm.itmc.taskracer.exception.RoleInsufficientException;
 import ptithcm.itmc.taskracer.repository.JpaTeamRepository;
+import ptithcm.itmc.taskracer.repository.model.enumeration.Visibility;
 import ptithcm.itmc.taskracer.service.dto.team.TeamDto;
 import ptithcm.itmc.taskracer.service.mapper.team.TeamServiceMapper;
 
@@ -16,9 +22,9 @@ public interface ITeamService {
 
     TeamDto getTeamBySlug(String slug);
 
-    List<TeamDto> getAllTeam();
+    PageableObject<List<TeamDto>> getAllTeam(int page, int size);
 
-    void updateTeam(String slug, TeamDto teamDto, UUID userId);
+    TeamDto updateTeam(String slug, TeamDto teamDto, UUID userId);
 
     void deleteTeam(String slug, UUID userId);
 
@@ -60,17 +66,29 @@ class TeamServiceProcessor implements ITeamService {
 
     @Override
     public TeamDto getTeamBySlug(String slug) {
+        var data = jpaTeamRepository.findBySlug(slug).orElseThrow(() -> new ResourceNotFound("Team slug not found."));
+        return teamServiceMapper.toDto(data);
+    }
+
+    @Override
+    public PageableObject<List<TeamDto>> getAllTeam(int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        var data = jpaTeamRepository.findAllByVisibility(pageable, Visibility.PUBLIC);
+        return PageableObject.<List<TeamDto>>builder()
+                .content(teamServiceMapper.toDto(data.getContent()))
+                .totalElements(data.getTotalElements())
+                .totalPage(data.getTotalPages())
+                .currentPage(data.getNumber())
+                .build();
+    }
+
+    @Override
+    public TeamDto updateTeam(String slug, TeamDto teamDto, UUID userId) {
+        var findTeam = jpaTeamRepository.findBySlug(slug).orElseThrow(() -> new ResourceNotFound("Team slug not found."));
+        if (!findTeam.getOwner().getId().equals(userId)) {
+            throw new RoleInsufficientException("You are not allowed to update this team.");
+        }
         return null;
-    }
-
-    @Override
-    public List<TeamDto> getAllTeam() {
-        return List.of();
-    }
-
-    @Override
-    public void updateTeam(String slug, TeamDto teamDto, UUID userId) {
-
     }
 
     @Override

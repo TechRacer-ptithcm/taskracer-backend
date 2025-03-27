@@ -180,7 +180,7 @@ class AuthServiceProcessor implements IAuthService {
         if (!jwtUtil.validateToken(token)) {
             throw new ValidationFailedException("Invalid refresh token.");
         }
-        var username = jwtUtil.getClaim(token, "username");
+        var username = jwtUtil.extractUsername(token);
         var userData = jpaUserRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFound("User not found."));
         return jwtUtil.generateToken(userData.getId(), username, TimeUnit.HOURS.toMillis(expireTimeByHour));
     }
