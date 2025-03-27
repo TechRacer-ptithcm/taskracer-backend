@@ -3,6 +3,8 @@ package ptithcm.itmc.taskracer.service.process.task;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import ptithcm.itmc.taskracer.exception.ResourceNotFound;
 import ptithcm.itmc.taskracer.repository.JpaTaskRepository;
@@ -48,6 +50,7 @@ class TaskServiceProcessor implements ITaskService {
     }
 
     @Override
+    @Cacheable(value = "task", key = "#p0")
     public TaskDto getTaskById(UUID id, UUID ownerId) {
         var data = jpaTaskRepository.findByIdAndOwner(id, ownerId).orElseThrow(() ->
                 new ResourceNotFound("Task not found."));
@@ -69,6 +72,7 @@ class TaskServiceProcessor implements ITaskService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "task", key = "#p1")
     public TaskDto updateTask(TaskDto newTaskData, UUID taskId, UUID ownerId) { //Without add user to task -- for user
         var foundTask = jpaTaskRepository.findByIdAndOwner(taskId, ownerId).orElseThrow(() ->
                 new ResourceNotFound("Task not found."));
@@ -84,6 +88,7 @@ class TaskServiceProcessor implements ITaskService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "task", key = "#p0")
     public TaskDto deleteTask(UUID id, UUID ownerId) {
         var foundTask = jpaTaskRepository.findByIdAndOwner(id, ownerId).orElseThrow(() ->
                 new ResourceNotFound("Task not found."));
@@ -92,11 +97,13 @@ class TaskServiceProcessor implements ITaskService {
     }
 
     @Override
+    @CacheEvict(value = "task", key = "#p0.taskId")
     public TaskDto addUserToTask(HandleUserDto request) {
         return null; //Stage 2
     }
 
     @Override
+    @CacheEvict(value = "task", key = "#p0.taskId")
     public TaskDto removeUserFromTask(HandleUserDto request) {
         return null; //Stage 2
     }

@@ -22,15 +22,13 @@ public class JwtUtil {
 
     public String generateToken(UUID userId, String username, Long time) {
         return Jwts.builder()
-                .setSubject(userId.toString())
-                .claim("username", username)
+                .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + time))
                 .signWith(Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8)), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    @Deprecated
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }

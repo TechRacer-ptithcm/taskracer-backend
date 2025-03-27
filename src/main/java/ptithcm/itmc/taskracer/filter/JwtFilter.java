@@ -57,11 +57,13 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     private Optional<UserDto> extractUserFromToken(String token) {
-        String getUserName = jwtUtil.getClaim(token, "username");
+        String getUserName = jwtUtil.extractUsername(token);
         if (getUserName.isEmpty()) {
             return Optional.empty();
         }
-        return Optional.ofNullable(userService.getUserDataByUserName(getUserName));
+        var data = userService.getUserDataByUserName(getUserName);
+        log.info("User data: {}", data);
+        return Optional.ofNullable(data);
     }
 
     @Override
