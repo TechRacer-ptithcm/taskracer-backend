@@ -3,14 +3,17 @@ package ptithcm.itmc.taskracer.filter;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-@Component
 @Order(Ordered.HIGHEST_PRECEDENCE) // Đảm bảo filter chạy đầu tiên
+@RequiredArgsConstructor
+@Slf4j
+@Deprecated
 public class CorsFilter implements Filter {
 
     @Override
@@ -19,9 +22,8 @@ public class CorsFilter implements Filter {
 
         HttpServletResponse response = (HttpServletResponse) res;
         HttpServletRequest request = (HttpServletRequest) req;
-
-        response.setHeader("Access-Control-Allow-Origin", "*");
-        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173, https://taskracer.id.vn");
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
         response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
         response.setHeader("Access-Control-Allow-Credentials", "true");
 

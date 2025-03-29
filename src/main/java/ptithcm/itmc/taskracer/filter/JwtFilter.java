@@ -12,15 +12,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import ptithcm.itmc.taskracer.common.web.enumeration.ResponseCode;
-import ptithcm.itmc.taskracer.common.web.response.ErrorObject;
-import ptithcm.itmc.taskracer.common.web.response.ResponseAPI;
 import ptithcm.itmc.taskracer.exception.AuthenticationFailedException;
 import ptithcm.itmc.taskracer.service.dto.user.UserDto;
 import ptithcm.itmc.taskracer.service.process.user.IUserService;
 import ptithcm.itmc.taskracer.util.jwt.JwtUtil;
 
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,8 +37,8 @@ public class JwtFilter extends OncePerRequestFilter {
     );
     private final IUserService userService;
 
-    private String extractToken(HttpServletRequest request) {
-        String authorizationHeader = request.getHeader("Authorization");
+    private String extractToken(String authorizationHeader) {
+        log.info("Authorization header: {}", authorizationHeader);
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             return authorizationHeader.substring("Bearer ".length());
         }
@@ -62,7 +60,6 @@ public class JwtFilter extends OncePerRequestFilter {
             return Optional.empty();
         }
         var data = userService.getUserDataByUserName(getUserName);
-        log.info("User data: {}", data);
         return Optional.ofNullable(data);
     }
 
@@ -70,51 +67,53 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
         String requestUri = request.getRequestURI();
-
+        log.info(">>> URI: {}", requestUri);
+        // Log ra header
+        log.info(">>> Method: {}", request.getMethod());
+        Enumeration<String> headerNames = request.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
+            String headerName = headerNames.nextElement();
+            String headerValue = request.getHeader(headerName);
+            log.info(">>> Header: {} = {}", headerName, headerValue);
+        }
+        //Bypass OPTIONS
+        if (request.getMethod().equals("OPTIONS")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         // Bypass các path không cần xác thực
         if (BYPASS_PATHS.stream().anyMatch(requestUri::startsWith)) {
             filterChain.doFilter(request, response);
             return;
         }
-        try {
-            // Lấy token từ header Authorization
-            String token = extractToken(request);
-            if (token == null) {
-                throw new AuthenticationFailedException("Missing Authorization Header");
-            }
-
-            validateToken(token);
-
-            // Lấy thông tin user từ token
-            Optional<UserDto> userOptional = extractUserFromToken(token);
-
-            if (userOptional.isEmpty()) {
-                throw new AuthenticationFailedException("Failed to set user authentication in security context");
-            }
-
-            UserDto user = userOptional.get();
-
-            if (requestUri.startsWith("/api/admin") && !"ADMIN".equals(user.getTier().name())) {
-                throw new AuthenticationFailedException("You don't have permission to access this endpoint");
-            }
-
-            if (SecurityContextHolder.getContext().getAuthentication() == null) {
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(user, null, null);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
-
-            filterChain.doFilter(request, response);
-
-        } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json");
-            objectMapper.writeValue(response.getWriter(), ResponseAPI.builder()
-                    .code(ResponseCode.ERROR.getCode())
-                    .message(ResponseCode.ERROR.getMessage())
-                    .status(false)
-                    .data(new ErrorObject(e.getMessage()))
-                    .build());
+        // Lấy token từ header Authorization
+        String authorizationHeader = request.getHeader("authorization");
+        String token = extractToken(authorizationHeader);
+        if (token == null) {
+            throw new AuthenticationFailedException("Missing Authorization Header");
         }
+
+        validateToken(token);
+
+        // Lấy thông tin user từ token
+        Optional<UserDto> userOptional = extractUserFromToken(token);
+
+        if (userOptional.isEmpty()) {
+            throw new AuthenticationFailedException("Failed to set user authentication in security context");
+        }
+
+        UserDto user = userOptional.get();
+
+        if (requestUri.startsWith("/api/admin") && !"ADMIN".equals(user.getTier().name())) {
+            throw new AuthenticationFailedException("You don't have permission to access this endpoint");
+        }
+
+        if (SecurityContextHolder.getContext().getAuthentication() == null) {
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(user, null, null);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
+
+        filterChain.doFilter(request, response);
     }
 }

@@ -2,6 +2,7 @@ package ptithcm.itmc.taskracer.service.mapper.team;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.springframework.util.StringUtils;
 import ptithcm.itmc.taskracer.repository.model.JpaTeam;
 import ptithcm.itmc.taskracer.repository.model.JpaUser;
 import ptithcm.itmc.taskracer.service.dto.team.TeamDto;
@@ -35,5 +36,15 @@ public interface TeamServiceMapper {
 
     default List<TeamDto> toDto(List<JpaTeam> data) {
         return data.stream().map(this::toDto).toList();
+    }
+
+    default TeamDto merge(TeamDto target, TeamDto source) {
+        if (StringUtils.hasText(source.getName())) {
+            target.setName(source.getName());
+        }
+        if (source.getVisibility() != null) {
+            target.setVisibility(source.getVisibility());
+        }
+        return target;
     }
 }

@@ -64,7 +64,7 @@ public class AuthController {
                 .status(true)
                 .data(result)
                 .build();
-        CookieUtil.addRefreshTokenCookie(response, jwtUtil, data.getId(), data.getUsername(), expireTimeCookieByDay);
+        CookieUtil.addRefreshTokenCookie(response, jwtUtil, data.getUsername(), expireTimeCookieByDay);
         return ResponseEntity.status(HttpStatus.OK).body(resp);
     }
 

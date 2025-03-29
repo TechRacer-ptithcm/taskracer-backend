@@ -21,6 +21,11 @@ task-racer:
     minute: 5
     hour: 1
     day: 31
+  pomodoro:
+    checkpoint: 5
+  allowedOrigins:
+    - http://localhost:5173
+    - https://taskracer.id.vn
 
 server:
   servlet:

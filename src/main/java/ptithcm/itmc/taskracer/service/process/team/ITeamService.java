@@ -93,7 +93,7 @@ class TeamServiceProcessor implements ITeamService {
 
     @Override
     public void deleteTeam(String slug, UUID userId) {
-
+        
     }
 
     @Override

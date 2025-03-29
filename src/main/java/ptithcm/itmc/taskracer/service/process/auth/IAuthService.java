@@ -103,7 +103,7 @@ class AuthServiceProcessor implements IAuthService {
                 .email(user.getEmail())
                 .active(user.getActive())
                 .tier(tierMapper.toDto(user.getTier()).getName())
-                .accessToken(jwtUtil.generateToken(user.getId(), user.getUsername(), expiredTime))
+                .accessToken(jwtUtil.generateToken(user.getUsername(), expiredTime))
                 .build();
     }
 
@@ -113,15 +113,14 @@ class AuthServiceProcessor implements IAuthService {
         Long expiredTime = TimeUnit.HOURS.toMillis(expireTimeByHour);
         String key = "otp:" + otp;
         if (!redisTemplate.hasKey(key)) throw new ExpiredException("OTP is not found or already used.");
-        String getUsername = (String) (redisTemplate.opsForValue().get(key));
+        String getUsername = (String) (redisTemplate.opsForValue().getAndDelete(key));
         log.info("otp get username: {}", getUsername);
-        redisTemplate.delete(key);
         var userData = jpaUserRepository.findByUsername(getUsername);
         if (userData.isEmpty()) throw new ResourceNotFound("User not found.");
         userData.ifPresent(jpaUser -> jpaUser.setActive(true));
         return VerifyAccountDto.builder()
                 .message("Verify account successfully.")
-                .accessToken(jwtUtil.generateToken(userData.get().getId(), getUsername, expiredTime))
+                .accessToken(jwtUtil.generateToken(getUsername, expiredTime))
                 .build();
     }
 
@@ -181,7 +180,7 @@ class AuthServiceProcessor implements IAuthService {
             throw new ValidationFailedException("Invalid refresh token.");
         }
         var username = jwtUtil.extractUsername(token);
-        var userData = jpaUserRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFound("User not found."));
-        return jwtUtil.generateToken(userData.getId(), username, TimeUnit.HOURS.toMillis(expireTimeByHour));
+        jpaUserRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFound("User not found."));
+        return jwtUtil.generateToken(username, TimeUnit.HOURS.toMillis(expireTimeByHour));
     }
 }

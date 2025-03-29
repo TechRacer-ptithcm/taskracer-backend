@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import java.util.UUID;
 import java.util.function.Function;
 
 @Component
@@ -20,7 +19,7 @@ public class JwtUtil {
     @Value("${task-racer.jwt-secret-key}")
     protected String SECRET_KEY;
 
-    public String generateToken(UUID userId, String username, Long time) {
+    public String generateToken(String username, Long time) {
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
