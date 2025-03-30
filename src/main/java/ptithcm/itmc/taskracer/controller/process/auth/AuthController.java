@@ -150,4 +150,18 @@ public class AuthController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    @PostMapping("logout")
+    public ResponseEntity<ResponseAPI<?>> logout(HttpServletRequest request, HttpServletResponse response) {
+        CookieUtil.getCookieValue(request, "refresh_token")
+                .orElseThrow(() -> new ResourceNotFound("Refresh token not found."));
+        CookieUtil.deleteCookie(response, "refresh_token", "/");
+        var resp = ResponseAPI.builder()
+                .code(ResponseCode.SUCCESS.getCode())
+                .message(ResponseCode.SUCCESS.getMessage())
+                .status(true)
+                .data(new ResponseMessage("Logout successful."))
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(resp);
+    }
 }

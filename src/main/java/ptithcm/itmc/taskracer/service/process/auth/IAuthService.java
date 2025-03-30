@@ -42,6 +42,7 @@ public interface IAuthService {
     void changePassword(String token, String newPassword) throws Exception;
 
     String refreshAccessToken(String token);
+
 }
 
 @Service

@@ -37,12 +37,15 @@ public class CookieUtil {
     }
 
     public static void deleteCookie(HttpServletResponse response, String name, String path) {
-        Cookie cookie = new Cookie(name, "");
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setPath(path);
-        cookie.setMaxAge(0); // xóa cookie
-        response.addCookie(cookie);
+        ResponseCookie cookie = ResponseCookie.from(name, "")
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
+                .path(path)
+                .maxAge(Duration.ofSeconds(0))
+                .build();
+        response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
     }
 
     public static void addRefreshTokenCookie(

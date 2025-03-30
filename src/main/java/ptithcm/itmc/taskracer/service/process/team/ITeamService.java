@@ -84,16 +84,20 @@ class TeamServiceProcessor implements ITeamService {
 
     @Override
     public TeamDto updateTeam(String slug, TeamDto teamDto, UUID userId) {
-        var findTeam = jpaTeamRepository.findBySlug(slug).orElseThrow(() -> new ResourceNotFound("Team slug not found."));
-        if (!findTeam.getOwner().getId().equals(userId)) {
+        var findTeam = teamServiceMapper.toDto(jpaTeamRepository
+                .findBySlug(slug)
+                .orElseThrow(() -> new ResourceNotFound("Team slug not found.")));
+        if (!findTeam.getOwnerId().equals(userId)) {
             throw new RoleInsufficientException("You are not allowed to update this team.");
         }
-        return null;
+        var mergeData = teamServiceMapper.merge(findTeam, teamDto);
+        var updateData = jpaTeamRepository.save(teamServiceMapper.toJpa(mergeData));
+        return teamServiceMapper.toDto(updateData);
     }
 
     @Override
     public void deleteTeam(String slug, UUID userId) {
-        
+
     }
 
     @Override
