@@ -30,4 +30,31 @@ public class PomodoroController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
+
+
+    @PostMapping("stop")
+    public ResponseEntity<ResponseAPI<?>> stopPomodoro() {
+        var userData = authHelper.getUser();
+        var data = pomodoroService.stopPomodoro(userData.getId());
+        var result = ResponseAPI.builder()
+                .data(data)
+                .code(ResponseCode.SUCCESS.getCode())
+                .message(ResponseCode.SUCCESS.getMessage())
+                .status(true)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
+
+    @PostMapping("checkpoint")
+    public ResponseEntity<ResponseAPI<?>> checkpointPomodoro() {
+        var userData = authHelper.getUser();
+        var data = pomodoroService.checkpoint(userData.getId());
+        var result = ResponseAPI.builder()
+                .data(data)
+                .code(ResponseCode.SUCCESS.getCode())
+                .message(ResponseCode.SUCCESS.getMessage())
+                .status(true)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
 }

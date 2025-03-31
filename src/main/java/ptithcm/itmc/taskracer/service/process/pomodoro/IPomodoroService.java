@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -15,9 +14,9 @@ import java.util.concurrent.TimeUnit;
 public interface IPomodoroService {
     Long startPomodoro(UUID userId);
 
-    Long checkPoint(UUID userId);
+    Long checkpoint(UUID userId);
 
-    Long endPomodoro(UUID userId);
+    Long stopPomodoro(UUID userId);
 }
 
 @Slf4j
@@ -30,7 +29,7 @@ class PomodoroServiceProcessor implements IPomodoroService {
 
     @Override
     public Long startPomodoro(UUID userId) {
-        String key = "pomodoro:" + userId;
+        String key = "pomodoro::" + userId;
         Long timestamp = Instant.now().getEpochSecond();
         var existTime = (Integer) redisTemplate.opsForValue().get(key);
         log.info("exist time: {}", existTime);
@@ -46,16 +45,17 @@ class PomodoroServiceProcessor implements IPomodoroService {
     }
 
     @Override
-    @CachePut(value = "pomodoro", key = "#p0")
-    public Long checkPoint(UUID userId) { //TODO: increase point to ranking
-        String key = "pomodoro:" + userId;
+//    @CachePut(value = "pomodoro", key = "#p0")
+    public Long checkpoint(UUID userId) { //TODO: increase point to ranking
+        String key = "pomodoro::" + userId;
         Long timestamp = Instant.now().getEpochSecond();
-        var getStartTime = (Long) redisTemplate.opsForValue().get(key);
+        var getStartTime = (Integer) redisTemplate.opsForValue().get(key);
         Long getDuration = redisTemplate.getExpire(key);
+        log.info("checkpoint time: {} - {} [{}]", timestamp, getStartTime, TimeUnit.MINUTES.toSeconds(pomodoroCheckPointMinute));
         if (getStartTime == null) {
             throw new RuntimeException("Pomodoro is not started.");
         }
-        if (timestamp - getStartTime < TimeUnit.SECONDS.toSeconds(pomodoroCheckPointMinute)) {
+        if (timestamp - getStartTime < TimeUnit.MINUTES.toSeconds(pomodoroCheckPointMinute)) {
             throw new RuntimeException("Checkpoint time has not been reached yet.");
         }
         redisTemplate.opsForValue().setIfPresent(key, timestamp, getDuration, TimeUnit.SECONDS);
@@ -65,9 +65,13 @@ class PomodoroServiceProcessor implements IPomodoroService {
 
     @Override
     @CacheEvict(value = "pomodoro", key = "#p0")
-    public Long endPomodoro(UUID userId) {
+    public Long stopPomodoro(UUID userId) {
+        String key = "pomodoro::" + userId;
+        var existTime = (Integer) redisTemplate.opsForValue().get(key);
+        if (existTime == null)
+            throw new RuntimeException("Pomodoro is not started.");
         Long timestamp = Instant.now().getEpochSecond();
-        log.info("pomodoro:: time end: {} - {}", timestamp, userId);
+        log.info("pomodoro:: time: {} - {}", existTime, timestamp);
         return timestamp;
     }
 }
