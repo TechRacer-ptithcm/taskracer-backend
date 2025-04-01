@@ -9,7 +9,6 @@ Taks Racer là một nền tảng **tối ưu hóa học tập cho sinh viên**,
 - **Ngôn ngữ**: Java 21
 - **Framework**: Spring Boot
 - **Cơ sở dữ liệu**: PostgreSQL, Redis (caching)
-- **Giao tiếp Message Queue**: Apache Kafka
 - **API**: RESTful API, WebSocket
 - **Authentication & Authorization**: Spring Security, JWT
 - **Containerization**: Docker, Kubernetes
