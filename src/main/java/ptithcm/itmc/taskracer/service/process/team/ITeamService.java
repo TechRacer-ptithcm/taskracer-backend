@@ -97,7 +97,13 @@ class TeamServiceProcessor implements ITeamService {
 
     @Override
     public void deleteTeam(String slug, UUID userId) {
-
+        var findTeam = teamServiceMapper.toDto(jpaTeamRepository
+                .findBySlug(slug)
+                .orElseThrow(() -> new ResourceNotFound("Team slug not found.")));
+        if (!findTeam.getOwnerId().equals(userId)) {
+            throw new RoleInsufficientException("You are not allowed to delete this team.");
+        }
+        jpaTeamRepository.deleteBySlug(slug);
     }
 
     @Override

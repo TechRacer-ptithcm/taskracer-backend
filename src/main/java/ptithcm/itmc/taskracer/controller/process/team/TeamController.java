@@ -3,7 +3,9 @@ package ptithcm.itmc.taskracer.controller.process.team;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ptithcm.itmc.taskracer.common.web.enumeration.ResponseCode;
 import ptithcm.itmc.taskracer.common.web.response.ResponseAPI;
+import ptithcm.itmc.taskracer.controller.mapper.team.TeamControllerMapper;
 import ptithcm.itmc.taskracer.service.process.team.ITeamService;
 
 @RestController
@@ -11,10 +13,18 @@ import ptithcm.itmc.taskracer.service.process.team.ITeamService;
 @RequiredArgsConstructor
 public class TeamController {
     private final ITeamService teamService;
+    private final TeamControllerMapper teamControllerMapper;
 
-    @GetMapping("team/{id}")
-    public ResponseEntity<ResponseAPI<?>> getTeamById(@PathVariable String id) {
-        return null;
+    @GetMapping("team/{slug}")
+    public ResponseEntity<ResponseAPI<?>> getTeamById(@PathVariable String slug) {
+        var team = teamService.getTeamBySlug(slug);
+        var resp = ResponseAPI.builder()
+                .code(ResponseCode.SUCCESS.getCode())
+                .message(ResponseCode.SUCCESS.getMessage())
+                .status(true)
+                .data(teamControllerMapper.toDomain(team))
+                .build();
+        return ResponseEntity.ok(resp);
     }
 
     @GetMapping("teams")

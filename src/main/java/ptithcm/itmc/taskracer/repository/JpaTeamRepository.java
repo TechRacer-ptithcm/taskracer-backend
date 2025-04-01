@@ -14,4 +14,6 @@ public interface JpaTeamRepository extends JpaRepository<JpaTeam, UUID> {
     Optional<JpaTeam> findBySlug(String slug);
 
     Page<JpaTeam> findAllByVisibility(@NonNull Pageable pageable, Visibility visibility);
+
+    void deleteBySlug(String slug);
 }
