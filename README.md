@@ -31,7 +31,7 @@ Taks Racer là một nền tảng **tối ưu hóa học tập cho sinh viên**,
 
 ### 3️⃣ **Quản lý tài liệu học tập**
 
-✔ **Tải lên & lưu trữ tài liệu** theo từng môn học (AWS S3, Firebase Storage).  
+✔ **Tải lên & lưu trữ tài liệu** theo từng môn học (AWS S3).  
 ✔ **Tìm kiếm thông minh**: Lọc theo môn học, tag.  
 ✔ **Ghi chú & highlight** trực tiếp trên tài liệu.
 
