@@ -54,4 +54,4 @@ Taks Racer là một nền tảng **tối ưu hóa học tập cho sinh viên**,
 
 - Java 21
 - Docker & Docker Compose
-- PostgreSQL, Redis, Kafka
+- PostgreSQL, Redis
