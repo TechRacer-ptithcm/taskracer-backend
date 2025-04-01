@@ -1,34 +1,28 @@
 package ptithcm.itmc.taskracer.util.jwt;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import ptithcm.itmc.taskracer.service.dto.user.UserDto;
 
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
-import java.util.Base64;
 import java.util.Date;
 import java.util.function.Function;
 
 @Component
 @Slf4j
 public class JwtUtil {
-    @Value("${jwt.secret-key}")
+    @Value("${task-racer.jwt-secret-key}")
     protected String SECRET_KEY;
 
-    public String generateToken(UserDto user, Long time) {
+    public String generateToken(String username, Long time) {
         return Jwts.builder()
-                .setSubject(user.getId().toString())
-                .claim("username", user.getUsername())
-                .claim("email", user.getEmail())
-                .claim("tier", user.getTier().name())
+                .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + time))
                 .signWith(Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8)), SignatureAlgorithm.HS256)
@@ -45,7 +39,7 @@ public class JwtUtil {
     }
 
     public String getClaim(String token, String claim) {
-        return extractClaim(token, claims -> claims.get(claim, String.class));
+        return extractClaim(token, claims -> claims.get(claim).toString());
     }
 
     public Claims extractAllClaims(String token) {
@@ -66,6 +60,9 @@ public class JwtUtil {
             return true;
         } catch (SignatureException e) {
             log.error("Invalid JWT signature: {}", e.getMessage());
+            return false;
+        } catch (ExpiredJwtException e) {
+            log.error("Expired JWT token: {}", e.getMessage());
             return false;
         }
     }

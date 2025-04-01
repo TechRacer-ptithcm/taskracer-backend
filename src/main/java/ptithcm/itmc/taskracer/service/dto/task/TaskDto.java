@@ -9,6 +9,7 @@ import ptithcm.itmc.taskracer.repository.model.enumeration.ResourceType;
 import ptithcm.itmc.taskracer.repository.model.enumeration.TaskStatus;
 import ptithcm.itmc.taskracer.service.dto.user.UserDto;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
@@ -17,16 +18,16 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TaskDto {
-    private Integer id;
+public class TaskDto implements Serializable {
+    private UUID id;
 
-    private TaskDto parent;
+    private UUID parent;
 
     private ResourceType type;
 
     private UUID resourceId; // user_id or team_id
 
-    private UserDto owner;
+    private UUID owner;
 
     private String content;
 
@@ -41,5 +42,5 @@ public class TaskDto {
     private TaskStatus status;
 
     private Set<UserDto> users;
-    
+
 }

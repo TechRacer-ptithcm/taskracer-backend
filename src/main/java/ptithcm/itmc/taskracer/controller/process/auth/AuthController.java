@@ -1,11 +1,14 @@
 package ptithcm.itmc.taskracer.controller.process.auth;
 
 import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,25 +19,30 @@ import ptithcm.itmc.taskracer.common.web.response.ResponseMessage;
 import ptithcm.itmc.taskracer.controller.dto.auth.*;
 import ptithcm.itmc.taskracer.controller.mapper.auth.AuthControllerMapper;
 import ptithcm.itmc.taskracer.exception.MissingFieldException;
-import ptithcm.itmc.taskracer.service.process.auth.AuthService;
+import ptithcm.itmc.taskracer.exception.ResourceNotFound;
+import ptithcm.itmc.taskracer.service.process.auth.IAuthService;
+import ptithcm.itmc.taskracer.util.jwt.CookieUtil;
+import ptithcm.itmc.taskracer.util.jwt.JwtUtil;
 
 
 @RestController
-@Controller
 @RequestMapping("auth")
 @RequiredArgsConstructor
 @Slf4j
 public class AuthController {
-    private final AuthService authService;
+    private final IAuthService authService;
     private final AuthControllerMapper authControllerMapper;
+    private final JwtUtil jwtUtil;
+    @Value("${task-racer.expire.day}")
+    private Integer expireTimeCookieByDay;
 
     @PostMapping("sign-up")
-    public ResponseEntity<ResponseAPI<?>> createNewUser(@RequestBody SignUpRequest request) throws MessagingException {
+    public ResponseEntity<ResponseAPI<?>> createNewUser(@Valid @RequestBody SignUpRequest request) throws MessagingException {
         log.info("Create new user: {}", request);
         if (request.getUsername().isEmpty() || request.getPassword().isEmpty() || request.getEmail().isEmpty())
             throw new MissingFieldException("Missing field.");
-        var data = authService.createNewUser(authControllerMapper.toSignUpDto(request));
-        var result = authControllerMapper.toSignUpResponse(data);
+        var data = authService.createNewUser(authControllerMapper.toDto(request));
+        var result = authControllerMapper.toDomain(data);
         var response = ResponseAPI.<SignUpResponse>builder()
                 .code(ResponseCode.SUCCESS.getCode())
                 .message(ResponseCode.SUCCESS.getMessage())
@@ -45,31 +53,32 @@ public class AuthController {
     }
 
     @PostMapping("sign-in")
-    public ResponseEntity<ResponseAPI<?>> signIn(@RequestBody SignInRequest request) {
-        log.info("Sign In: {}", request);
+    public ResponseEntity<ResponseAPI<?>> signIn(@RequestBody SignInRequest request, HttpServletResponse response) {
         if (request.getInputAccount().isEmpty() || request.getPassword().isEmpty())
             throw new MissingFieldException("Missing field.");
-        var data = authService.signIn(authControllerMapper.toSignInDto(request));
-        var result = authControllerMapper.toSignInResponse(data);
-        var response = ResponseAPI.<SignInResponse>builder()
+        var data = authService.signIn(authControllerMapper.toDto(request));
+        var result = authControllerMapper.toDomain(data);
+        var resp = ResponseAPI.<SignInResponse>builder()
                 .code(ResponseCode.SUCCESS.getCode())
                 .message(ResponseCode.SUCCESS.getMessage())
                 .status(true)
                 .data(result)
                 .build();
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        CookieUtil.addRefreshTokenCookie(response, jwtUtil, data.getUsername(), expireTimeCookieByDay);
+        return ResponseEntity.status(HttpStatus.OK).body(resp);
     }
 
     @PostMapping("verify-account")
     public ResponseEntity<ResponseAPI<?>> verifyAccount(@RequestBody VerifyAccountRequest request) {
 //        var principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 //        var userData = ParseObject.parse(principal, UserDto.class);
-        authService.verifyAccount(request.getOtp());
+        var data = authService.verifyAccount(request.getOtp());
+        var returnData = authControllerMapper.toDomain(data);
         var response = ResponseAPI.builder()
                 .code(ResponseCode.SUCCESS.getCode())
                 .message(ResponseCode.SUCCESS.getMessage())
                 .status(true)
-                .data(new ResponseMessage("Active account successful"))
+                .data(returnData)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -114,4 +123,45 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @PostMapping("reset-password")
+    public ResponseEntity<ResponseAPI<?>> changePassword(@RequestBody ChangePasswordRequest request) throws Exception {
+        authService.changePassword(request.getToken(), request.getNewPassword());
+        var response = ResponseAPI.builder()
+                .code(ResponseCode.SUCCESS.getCode())
+                .message(ResponseCode.SUCCESS.getMessage())
+                .status(true)
+                .data(new ResponseMessage("Change password successful"))
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PostMapping("refresh")
+    public ResponseEntity<ResponseAPI<?>> refreshAccessToken(HttpServletRequest request) {
+        var refreshToken = CookieUtil.getCookieValue(request, "refresh_token")
+                .orElseThrow(() -> new ResourceNotFound("Refresh token not found."));
+        var data = authService.refreshAccessToken(refreshToken);
+        var response = ResponseAPI.builder()
+                .code(ResponseCode.SUCCESS.getCode())
+                .message(ResponseCode.SUCCESS.getMessage())
+                .status(true)
+                .data(RefreshAccessTokenResponse.builder()
+                        .accessToken(data)
+                        .build())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PostMapping("logout")
+    public ResponseEntity<ResponseAPI<?>> logout(HttpServletRequest request, HttpServletResponse response) {
+        CookieUtil.getCookieValue(request, "refresh_token")
+                .orElseThrow(() -> new ResourceNotFound("Refresh token not found."));
+        CookieUtil.deleteCookie(response, "refresh_token", "/");
+        var resp = ResponseAPI.builder()
+                .code(ResponseCode.SUCCESS.getCode())
+                .message(ResponseCode.SUCCESS.getMessage())
+                .status(true)
+                .data(new ResponseMessage("Logout successful."))
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(resp);
+    }
 }

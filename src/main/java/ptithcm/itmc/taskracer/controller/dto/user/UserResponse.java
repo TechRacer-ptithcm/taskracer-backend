@@ -17,7 +17,7 @@ import java.util.UUID;
 public class UserResponse {
     private UUID id;
     private Tier tier;
-    private Integer score;
+    private Integer streak;
     private String username;
     private String email;
     private Boolean active;

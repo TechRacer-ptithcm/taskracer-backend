@@ -18,7 +18,7 @@ import java.util.UUID;
 public class UserDto implements Serializable {
     private UUID id;
     private Tier tier;
-    private Integer score;
+    private Integer streak;
     private String username;
     private String password;
     private String email;

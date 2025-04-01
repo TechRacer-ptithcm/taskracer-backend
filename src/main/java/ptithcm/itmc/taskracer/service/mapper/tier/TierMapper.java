@@ -11,14 +11,18 @@ import ptithcm.itmc.taskracer.service.dto.tier.TierDto;
 public interface TierMapper {
     TierMapper INSTANCE = Mappers.getMapper(TierMapper.class);
 
-    JpaTier toJpaTier(TierDto tier);
+    JpaTier toJpa(TierDto tier);
 
-    TierDto toTierDto(JpaTier tier);
+    TierDto toDto(JpaTier tier);
 
     @Named("mapTier")
-    default Tier mapTier(JpaTier tier) {
+    default Tier map(JpaTier tier) {
         if (tier == null)
             return null;
         return Tier.valueOf(tier.getName().name());
+    }
+
+    default JpaTier map(Tier tier) {
+        return new JpaTier(tier.ordinal(), tier, "");
     }
 }

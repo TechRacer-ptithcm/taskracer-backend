@@ -1,24 +1,20 @@
 package ptithcm.itmc.taskracer.controller.mapper.auth;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import ptithcm.itmc.taskracer.controller.dto.auth.SignInRequest;
-import ptithcm.itmc.taskracer.controller.dto.auth.SignInResponse;
-import ptithcm.itmc.taskracer.controller.dto.auth.SignUpRequest;
-import ptithcm.itmc.taskracer.controller.dto.auth.SignUpResponse;
-import ptithcm.itmc.taskracer.service.dto.auth.SignInRequestDto;
-import ptithcm.itmc.taskracer.service.dto.auth.SignInResponseDto;
-import ptithcm.itmc.taskracer.service.dto.auth.SignUpRequestDto;
-import ptithcm.itmc.taskracer.service.dto.auth.SignUpResponseDto;
+import ptithcm.itmc.taskracer.controller.dto.auth.*;
+import ptithcm.itmc.taskracer.service.dto.auth.*;
 
 @Mapper(componentModel = "spring")
 public interface AuthControllerMapper {
-    SignUpRequestDto toSignUpDto(SignUpRequest request);
+    SignUpRequestDto toDto(SignUpRequest request);
 
-    SignUpResponse toSignUpResponse(SignUpResponseDto response);
+    SignUpResponse toDomain(SignUpResponseDto response);
 
-    SignInRequestDto toSignInDto(SignInRequest request);
+    SignInRequestDto toDto(SignInRequest request);
 
-    SignInResponse toSignInResponse(SignInResponseDto response);
+    SignInResponse toDomain(SignInResponseDto response);
+
+    VerifyAccountResponse toDomain(VerifyAccountDto request);
+
 
 }

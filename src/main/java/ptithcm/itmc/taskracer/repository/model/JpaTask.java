@@ -2,6 +2,7 @@ package ptithcm.itmc.taskracer.repository.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ptithcm.itmc.taskracer.repository.model.enumeration.Priority;
@@ -9,33 +10,32 @@ import ptithcm.itmc.taskracer.repository.model.enumeration.ResourceType;
 import ptithcm.itmc.taskracer.repository.model.enumeration.TaskStatus;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.Set;
 import java.util.UUID;
 
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "task", schema = "content")
+@Builder
+@Table(name = "tasks", schema = "content")
 public class JpaTask {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
-    @OneToOne
-    @JoinColumn(name = "parent_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id", referencedColumnName = "id", nullable = true)
     private JpaTask parent;
 
     @Column(name = "resource_type", nullable = false)
+    @Enumerated(EnumType.STRING)
     private ResourceType type;
 
     @Column(name = "resource_id", nullable = false)
     private UUID resourceId; // user_id or team_id
 
-    @ManyToOne
-    @JoinColumn(name = "owner_id", nullable = false)
-    private JpaUser owner;
+    @Column(name = "owner_id", nullable = false)
+    private UUID owner;
 
     @Column(nullable = false)
     private String content;
@@ -53,14 +53,7 @@ public class JpaTask {
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime dueAt;
 
-    @Column(name = "status", nullable = false)
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private TaskStatus status;
-
-    @ManyToMany
-    @JoinTable(name = "task_assignees",
-            schema = "content",
-            joinColumns = @JoinColumn(name = "task_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private Set<JpaUser> users;
-
 }

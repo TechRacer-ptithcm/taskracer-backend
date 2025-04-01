@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: TaskRacer
+  datasource:
+    url: jdbc:postgresql://localhost:5432/TaskRacer_test
+    username: postgres
+    password: 123
+    driver-class-name: org.postgresql.Driver
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: meowgum.forum.automail@gmail.com
+    password: "japq gkxw ednn msrs"
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      jedis:
+        pool:
+          enabled: true
+          max-active: 1000
+          max-idle: 100
+          min-idle: 10
+          max-wait: 500ms
