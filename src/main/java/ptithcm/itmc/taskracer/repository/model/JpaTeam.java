@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import ptithcm.itmc.taskracer.repository.model.enumeration.Visibility;
 
+import java.util.Objects;
 import java.util.Set;
 
 @EqualsAndHashCode(callSuper = true)
@@ -30,12 +31,23 @@ public class JpaTeam extends Auditable {
     private JpaUser owner;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private Visibility visibility;
 
-    @ManyToMany(cascade = CascadeType.PERSIST)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "team_members",
             schema = "social",
             joinColumns = @JoinColumn(name = "team_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<JpaUser> users;
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, slug, name, owner, visibility);
+    }
+
+    @Override
+    public String toString() {
+        return "JpaTeam{" + "id=" + id + ", slug=" + slug + ", name=" + name + ", owner=" + owner + ", visibility=" + visibility + '}';
+    }
 }

@@ -1,6 +1,8 @@
 package ptithcm.itmc.taskracer.repository.model.enumeration;
 
 public enum Role {
-    LEADER,
-    MEMBER
+    OWNER,
+    ADMIN,
+    MEMBER,
+    GUEST
 }

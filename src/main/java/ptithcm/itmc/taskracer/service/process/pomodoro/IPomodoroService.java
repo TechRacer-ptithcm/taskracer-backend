@@ -6,17 +6,19 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import ptithcm.itmc.taskracer.service.dto.pomodoro.PomodoroDto;
+import ptithcm.itmc.taskracer.util.json.ParseObject;
 
 import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public interface IPomodoroService {
-    Long startPomodoro(UUID userId);
+    PomodoroDto startPomodoro(UUID userId);
 
-    Long checkpoint(UUID userId);
+    PomodoroDto checkpoint(UUID userId);
 
-    Long stopPomodoro(UUID userId);
+    PomodoroDto stopPomodoro(UUID userId);
 }
 
 @Slf4j
@@ -28,7 +30,7 @@ class PomodoroServiceProcessor implements IPomodoroService {
     private Integer pomodoroCheckPointMinute;
 
     @Override
-    public Long startPomodoro(UUID userId) {
+    public PomodoroDto startPomodoro(UUID userId) {
         String key = "pomodoro::" + userId;
         Long timestamp = Instant.now().getEpochSecond();
         var existTime = (Integer) redisTemplate.opsForValue().get(key);
@@ -36,42 +38,62 @@ class PomodoroServiceProcessor implements IPomodoroService {
         if (existTime != null) {
             throw new RuntimeException("Pomodoro is already started.");
         }
+        var dataToSave = PomodoroDto.builder()
+                .startTime(timestamp)
+                .checkpointTime(timestamp)
+                .point(0)
+                .build();
         redisTemplate.opsForValue().set(key,
-                timestamp,
+                dataToSave,
                 pomodoroCheckPointMinute + 1,
                 TimeUnit.MINUTES);
         log.info("pomodoro:: time start: {} - {}", timestamp, userId);
-        return timestamp;
+        return dataToSave;
     }
 
     @Override
 //    @CachePut(value = "pomodoro", key = "#p0")
-    public Long checkpoint(UUID userId) { //TODO: increase point to ranking
+    public PomodoroDto checkpoint(UUID userId) { //TODO: increase point to ranking
         String key = "pomodoro::" + userId;
         Long timestamp = Instant.now().getEpochSecond();
-        var getStartTime = (Integer) redisTemplate.opsForValue().get(key);
-        Long getDuration = redisTemplate.getExpire(key);
-        log.info("checkpoint time: {} - {} [{}]", timestamp, getStartTime, TimeUnit.MINUTES.toSeconds(pomodoroCheckPointMinute));
-        if (getStartTime == null) {
-            throw new RuntimeException("Pomodoro is not started.");
-        }
-        if (timestamp - getStartTime < TimeUnit.MINUTES.toSeconds(pomodoroCheckPointMinute)) {
+        var rawData = redisTemplate.opsForValue().get(key);
+        var getPomodoroTime = getPomodoroDto(rawData);
+        if (timestamp - getPomodoroTime.getCheckpointTime() < TimeUnit.MINUTES.toSeconds(pomodoroCheckPointMinute)) {
             throw new RuntimeException("Checkpoint time has not been reached yet.");
         }
-        redisTemplate.opsForValue().setIfPresent(key, timestamp, getDuration, TimeUnit.SECONDS);
+        getPomodoroTime.setCheckpointTime(timestamp);
+        getPomodoroTime.setPoint(getPomodoroTime.getPoint() + 1);
+        redisTemplate.opsForValue().setIfPresent(key, getPomodoroTime,
+                pomodoroCheckPointMinute + 1,
+                TimeUnit.MINUTES);
         log.info("pomodoro:: time checkpoint: {} - {}", timestamp, userId);
-        return timestamp;
+        return getPomodoroTime;
+    }
+
+    private PomodoroDto getPomodoroDto(Object rawData) {
+        var getPomodoroTime = ParseObject.parse(rawData, PomodoroDto.class);
+        if (getPomodoroTime == null) {
+            throw new RuntimeException("Pomodoro is not started.");
+        }
+        if (getPomodoroTime.getStartTime() == null) {
+            throw new RuntimeException("Pomodoro is not started.");
+        }
+        return getPomodoroTime;
     }
 
     @Override
     @CacheEvict(value = "pomodoro", key = "#p0")
-    public Long stopPomodoro(UUID userId) {
+    public PomodoroDto stopPomodoro(UUID userId) {
         String key = "pomodoro::" + userId;
-        var existTime = (Integer) redisTemplate.opsForValue().get(key);
-        if (existTime == null)
-            throw new RuntimeException("Pomodoro is not started.");
+        var rawData = redisTemplate.opsForValue().get(key);
+        var getPomodoroTime = getPomodoroDto(rawData);
         Long timestamp = Instant.now().getEpochSecond();
-        log.info("pomodoro:: time: {} - {}", existTime, timestamp);
-        return timestamp;
+        getPomodoroTime.setCheckpointTime(timestamp);
+        if (timestamp - getPomodoroTime.getCheckpointTime() >= TimeUnit.MINUTES.toSeconds(pomodoroCheckPointMinute)) {
+            getPomodoroTime.setPoint(getPomodoroTime.getPoint() + 1);
+        }
+        //TODO: add point
+        log.info("pomodoro:: time: {} - {}", getPomodoroTime.getStartTime(), getPomodoroTime.getCheckpointTime());
+        return getPomodoroTime;
     }
 }

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20250410000500-1" author="VinhNguyenD23">
+        <createTable tableName="rankings" schemaName="social">
+            <column name="id" type="UUID" defaultValue="gen_random_uuid()">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="user_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rank_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="score" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="deleted_at" type="TIMESTAMP"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="rankings" baseColumnNames="user_id" constraintName="fk_rankings_user"
+                                 referencedTableName="users" referencedColumnNames="id" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="rankings" baseColumnNames="rank_id"
+                                 constraintName="fk_rankings_rank_data" referencedTableName="rank_data"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="20250410000500-2" author="VinhNguyenD23">
+        <createTable tableName="contribution" schemaName="social">
+            <column name="id" type="UUID" defaultValue="gen_random_uuid()">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="date" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="minutes" type="INT"/>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="deleted_at" type="TIMESTAMP"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="contribution" baseColumnNames="user_id"
+                                 constraintName="fk_contribution_user" referencedTableName="users"
+                                 referencedColumnNames="id" onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="20250410000500-3" author="VinhNguyenD23">
+        <createTable tableName="message" schemaName="social">
+            <column name="id" type="UUID" defaultValue="gen_random_uuid()">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="team_id" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sender" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="content" type="TEXT"/>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="deleted_at" type="TIMESTAMP"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="message" baseColumnNames="team_id" constraintName="fk_message_team"
+                                 referencedTableName="teams" referencedColumnNames="id" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="message" baseColumnNames="sender" constraintName="fk_message_sender"
+                                 referencedTableName="users" referencedColumnNames="id" onDelete="CASCADE"/>
+    </changeSet>
+</databaseChangeLog>

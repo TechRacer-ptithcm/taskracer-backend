@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20250409234500-1" author="VinhNguyenD23">
+        <insert tableName="roles" schemaName="social">
+            <column name="name" value="OWNER"/>
+        </insert>
+
+        <insert tableName="roles" schemaName="social">
+            <column name="name" value="ADMIN"/>
+        </insert>
+
+        <insert tableName="roles" schemaName="social">
+            <column name="name" value="MEMBER"/>
+        </insert>
+
+        <insert tableName="roles" schemaName="social">
+            <column name="name" value="GUEST"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="20250409234500-2" author="VinhNguyenD23">
+        <!-- Permissions liên quan đến thành viên -->
+        <insert tableName="permissions" schemaName="social">
+            <column name="name" value="TEAM_ADD_MEMBER"/>
+        </insert>
+        <insert tableName="permissions" schemaName="social">
+            <column name="name" value="TEAM_REMOVE_MEMBER"/>
+        </insert>
+        <insert tableName="permissions" schemaName="social">
+            <column name="name" value="TEAM_EDIT_MEMBER_ROLE"/>
+        </insert>
+        <insert tableName="permissions" schemaName="social">
+            <column name="name" value="TEAM_VIEW_MEMBER"/>
+        </insert>
+
+        <!-- Permissions liên quan đến công việc -->
+        <insert tableName="permissions" schemaName="social">
+            <column name="name" value="TEAM_CREATE_TASK"/>
+        </insert>
+        <insert tableName="permissions" schemaName="social">
+            <column name="name" value="TEAM_EDIT_TASK"/>
+        </insert>
+        <insert tableName="permissions" schemaName="social">
+            <column name="name" value="TEAM_DELETE_TASK"/>
+        </insert>
+        <insert tableName="permissions" schemaName="social">
+            <column name="name" value="TEAM_VIEW_TASK"/>
+        </insert>
+
+        <!-- Permissions liên quan đến bài viết -->
+        <insert tableName="permissions" schemaName="social">
+            <column name="name" value="TEAM_CREATE_POST"/>
+        </insert>
+        <insert tableName="permissions" schemaName="social">
+            <column name="name" value="TEAM_EDIT_POST"/>
+        </insert>
+        <insert tableName="permissions" schemaName="social">
+            <column name="name" value="TEAM_DELETE_POST"/>
+        </insert>
+        <insert tableName="permissions" schemaName="social">
+            <column name="name" value="TEAM_VIEW_POST"/>
+        </insert>
+
+        <!-- Permissions hệ thống nhóm -->
+        <insert tableName="permissions" schemaName="social">
+            <column name="name" value="TEAM_MANAGE_SETTINGS"/>
+        </insert>
+        <insert tableName="permissions" schemaName="social">
+            <column name="name" value="TEAM_VIEW_ACTIVITY"/>
+        </insert>
+        <insert tableName="permissions" schemaName="social">
+            <column name="name" value="TEAM_ASSIGN_LEADER"/>
+        </insert>
+        <insert tableName="permissions" schemaName="social">
+            <column name="name" value="TEAM_ARCHIVE"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="20250409234500-3" author="VinhNguyenD23">
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'OWNER')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_ADD_MEMBER')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'OWNER')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_REMOVE_MEMBER')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'OWNER')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_EDIT_MEMBER_ROLE')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'OWNER')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_VIEW_MEMBER')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'OWNER')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_CREATE_TASK')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'OWNER')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_EDIT_TASK')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'OWNER')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_DELETE_TASK')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'OWNER')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_VIEW_TASK')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'OWNER')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_CREATE_POST')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'OWNER')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_EDIT_POST')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'OWNER')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_DELETE_POST')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'OWNER')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_VIEW_POST')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'OWNER')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_MANAGE_SETTINGS')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'OWNER')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_VIEW_ACTIVITY')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'OWNER')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_ASSIGN_LEADER')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'OWNER')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_ARCHIVE')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'ADMIN')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_ADD_MEMBER')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'ADMIN')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_REMOVE_MEMBER')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'ADMIN')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_EDIT_MEMBER_ROLE')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'ADMIN')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_VIEW_MEMBER')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'ADMIN')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_CREATE_TASK')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'ADMIN')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_EDIT_TASK')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'ADMIN')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_DELETE_TASK')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'ADMIN')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_VIEW_TASK')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'ADMIN')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_CREATE_POST')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'ADMIN')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_EDIT_POST')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'ADMIN')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_DELETE_POST')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'ADMIN')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_VIEW_POST')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'ADMIN')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_MANAGE_SETTINGS')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'ADMIN')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_VIEW_ACTIVITY')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'MEMBER')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_VIEW_MEMBER')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'MEMBER')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_CREATE_TASK')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'MEMBER')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_DELETE_TASK')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'MEMBER')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_EDIT_TASK')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'MEMBER')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_VIEW_TASK')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'MEMBER')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_CREATE_POST')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'MEMBER')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_EDIT_POST')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'MEMBER')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_VIEW_POST')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'MEMBER')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_DELETE_POST')"/>
+        </insert>
+        <insert tableName="role_permissions" schemaName="social">
+            <column name="role_id" valueComputed="(SELECT id FROM social.roles WHERE name = 'GUEST')"/>
+            <column name="permission_id"
+                    valueComputed="(SELECT id FROM social.permissions WHERE name = 'TEAM_VIEW_POST')"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

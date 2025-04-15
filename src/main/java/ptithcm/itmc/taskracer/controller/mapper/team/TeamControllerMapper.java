@@ -2,11 +2,20 @@ package ptithcm.itmc.taskracer.controller.mapper.team;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import ptithcm.itmc.taskracer.controller.dto.team.CreateNewTeamRequest;
 import ptithcm.itmc.taskracer.controller.dto.team.GetTeamResponse;
+import ptithcm.itmc.taskracer.controller.dto.team.UpdateTeamRequest;
 import ptithcm.itmc.taskracer.service.dto.team.TeamDto;
 
 @Mapper(componentModel = "spring")
 public interface TeamControllerMapper {
     @Mapping(target = "owner", source = "ownerId")
     GetTeamResponse toDomain(TeamDto team);
+
+    @Mapping(target = "users", ignore = true)
+    @Mapping(target = "id", ignore = true)
+    TeamDto toDto(CreateNewTeamRequest team);
+
+
+    TeamDto toDto(UpdateTeamRequest team);
 }

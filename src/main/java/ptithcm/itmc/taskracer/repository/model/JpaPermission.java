@@ -1,8 +1,8 @@
 package ptithcm.itmc.taskracer.repository.model;
 
 import jakarta.persistence.*;
-import lombok.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.*;
 
 import java.util.Set;
 
@@ -12,7 +12,7 @@ import java.util.Set;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "permission", schema = "social")
+@Table(name = "permissions", schema = "social")
 public class JpaPermission extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,4 +26,9 @@ public class JpaPermission extends Auditable {
 
     @ManyToMany(mappedBy = "permissions")
     private Set<JpaRole> roles;
+
+    @Override
+    public String toString() {
+        return "JpaPermission{" + "id=" + id + ", name=" + name + '}';
+    }
 }
