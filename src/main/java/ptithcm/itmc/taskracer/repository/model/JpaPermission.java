@@ -3,6 +3,7 @@ package ptithcm.itmc.taskracer.repository.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import ptithcm.itmc.taskracer.repository.model.enumeration.Permission;
 
 import java.util.Set;
 
@@ -20,7 +21,8 @@ public class JpaPermission extends Auditable {
 
     @NotNull
     @Column(unique = true)
-    private String name;
+    @Enumerated(EnumType.STRING)
+    private Permission name;
 
     private String description;
 

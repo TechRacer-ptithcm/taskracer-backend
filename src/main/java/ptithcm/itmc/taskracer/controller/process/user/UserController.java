@@ -12,7 +12,7 @@ import ptithcm.itmc.taskracer.common.web.response.ResponseAPI;
 import ptithcm.itmc.taskracer.controller.dto.user.UpdateUserRequest;
 import ptithcm.itmc.taskracer.controller.mapper.user.UserControllerMapper;
 import ptithcm.itmc.taskracer.helper.AuthHelper;
-import ptithcm.itmc.taskracer.service.process.user.IUserService;
+import ptithcm.itmc.taskracer.service.IUserService;
 
 @RestController
 @RequestMapping("social")

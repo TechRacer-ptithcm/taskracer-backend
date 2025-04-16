@@ -11,7 +11,7 @@ import ptithcm.itmc.taskracer.controller.dto.team.CreateNewTeamRequest;
 import ptithcm.itmc.taskracer.controller.dto.team.UpdateTeamRequest;
 import ptithcm.itmc.taskracer.controller.mapper.team.TeamControllerMapper;
 import ptithcm.itmc.taskracer.helper.AuthHelper;
-import ptithcm.itmc.taskracer.service.process.team.ITeamService;
+import ptithcm.itmc.taskracer.service.ITeamService;
 
 import java.util.UUID;
 

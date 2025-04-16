@@ -12,7 +12,7 @@ import ptithcm.itmc.taskracer.controller.dto.task.HandleUserInTaskRequest;
 import ptithcm.itmc.taskracer.controller.dto.task.UpdateTaskRequest;
 import ptithcm.itmc.taskracer.controller.mapper.task.TaskControllerMapper;
 import ptithcm.itmc.taskracer.helper.AuthHelper;
-import ptithcm.itmc.taskracer.service.process.task.ITaskService;
+import ptithcm.itmc.taskracer.service.ITaskService;
 
 import java.util.UUID;
 

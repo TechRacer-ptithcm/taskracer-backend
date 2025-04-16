@@ -11,15 +11,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.filter.OncePerRequestFilter;
 import ptithcm.itmc.taskracer.common.web.enumeration.ResponseCode;
 import ptithcm.itmc.taskracer.common.web.response.ErrorObject;
 import ptithcm.itmc.taskracer.common.web.response.ResponseAPI;
 import ptithcm.itmc.taskracer.exception.AuthenticationFailedException;
 import ptithcm.itmc.taskracer.repository.model.enumeration.Tier;
+import ptithcm.itmc.taskracer.service.IUserService;
 import ptithcm.itmc.taskracer.service.dto.user.UserDto;
-import ptithcm.itmc.taskracer.service.process.user.IUserService;
 import ptithcm.itmc.taskracer.util.jwt.JwtUtil;
 
 import java.io.IOException;
@@ -31,9 +30,6 @@ import java.util.Optional;
 @Slf4j
 @Component
 public class JwtFilter extends OncePerRequestFilter {
-    private final JwtUtil jwtUtil;
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
     private static final List<String> BYPASS_PATHS = List.of(
             "/api/auth",
             "/api/docs",
@@ -41,6 +37,8 @@ public class JwtFilter extends OncePerRequestFilter {
             "/api/api-docs",
             "/api/actuator"
     );
+    private final JwtUtil jwtUtil;
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private final IUserService userService;
 
     private String extractToken(String authorizationHeader) {

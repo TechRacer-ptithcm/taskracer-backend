@@ -1,4 +1,4 @@
-package ptithcm.itmc.taskracer.service.process.user;
+package ptithcm.itmc.taskracer.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

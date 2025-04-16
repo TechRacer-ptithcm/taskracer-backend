@@ -1,4 +1,4 @@
-package ptithcm.itmc.taskracer.service.process.task;
+package ptithcm.itmc.taskracer.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
