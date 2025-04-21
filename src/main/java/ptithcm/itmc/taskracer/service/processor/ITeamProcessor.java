@@ -1,19 +1,20 @@
 package ptithcm.itmc.taskracer.service.processor;
 
+import ptithcm.itmc.taskracer.repository.model.JpaTeam;
 import ptithcm.itmc.taskracer.service.dto.team.TeamDto;
 
 import java.util.UUID;
 
 public interface ITeamProcessor {
-    TeamDto createNewTeam(TeamDto teamDto, UUID ownerId);
+    JpaTeam create(TeamDto teamDto, UUID ownerId);
 
-    TeamDto updateTeam(String slug, TeamDto teamDto, UUID userId);
+    JpaTeam update(String slug, TeamDto teamDto, UUID userId);
 
-    void deleteTeam(String slug, UUID userId);
+    void delete(String slug, UUID userId);
 
-    void removeUserFromTeam(String slug, UUID userId, UUID removedUserId);
+    void removeUser(String slug, UUID userId, UUID removedUserId);
 
-    void inviteUserToTeam(String slug, UUID userId, UUID invitedUserId);
+    void inviteUser(String slug, UUID userId, UUID invitedUserId);
 
     void acceptInvite(String slug, UUID userId);
 

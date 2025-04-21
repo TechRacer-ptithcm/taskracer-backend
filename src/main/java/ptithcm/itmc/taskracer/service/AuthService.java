@@ -11,6 +11,7 @@ import ptithcm.itmc.taskracer.exception.ExpiredException;
 import ptithcm.itmc.taskracer.exception.ResourceNotFound;
 import ptithcm.itmc.taskracer.repository.JpaUserRepository;
 import ptithcm.itmc.taskracer.service.dto.auth.*;
+import ptithcm.itmc.taskracer.service.mapper.auth.AuthServiceMapper;
 import ptithcm.itmc.taskracer.service.mapper.user.UserServiceMapper;
 import ptithcm.itmc.taskracer.service.processor.IAuthProcessor;
 import ptithcm.itmc.taskracer.service.provider.IEmailProvider;
@@ -24,6 +25,8 @@ public class AuthService {
     private final UserServiceMapper userServiceMapper;
     private final IEmailProvider emailProvider;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final AuthServiceMapper mapper;
+    private final UserServiceMapper userMapper;
     
     @Transactional
     public SignUpResponseDto createNewUser(SignUpRequestDto request) throws MessagingException {
@@ -31,7 +34,9 @@ public class AuthService {
                 jpaUserRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new DuplicateDataException("Username or email already exists.");
         }
-        return processor.createNewUser(request);
+        var data = processor.createNewUser(request);
+        var formatData = userServiceMapper.toDto(data);
+        return mapper.toDto(formatData);
     }
 
     public SignInResponseDto signIn(SignInRequestDto request) {
@@ -59,7 +64,8 @@ public class AuthService {
 
     public OtpForgotPasswordDto VerifyChangePassword(String otp) throws Exception {
         var userData = emailProvider.getUserFromOtp(otp).orElseThrow(() -> new ExpiredException("OTP is not found or already used."));
-        return processor.VerifyChangePassword(userData);
+        var formatData = userServiceMapper.toDto(userData);
+        return processor.VerifyChangePassword(formatData);
     }
 
     public void resendOtp(String account) throws MessagingException {

@@ -1,18 +1,19 @@
 package ptithcm.itmc.taskracer.service.processor;
 
+import ptithcm.itmc.taskracer.repository.model.JpaTask;
 import ptithcm.itmc.taskracer.service.dto.task.HandleUserDto;
 import ptithcm.itmc.taskracer.service.dto.task.TaskDto;
 
 import java.util.UUID;
 
 public interface ITaskProcessor {
-    TaskDto createTask(TaskDto taskDto, UUID ownerId);
+    JpaTask createTask(TaskDto taskDto);
 
-    TaskDto updateTask(TaskDto newTaskData, UUID taskId, UUID ownerId);
+    JpaTask updateTask(TaskDto newTaskData, UUID taskId, UUID ownerId);
 
-    TaskDto deleteTask(UUID id, UUID ownerId);
+    JpaTask deleteTask(UUID id, UUID ownerId);
 
-    TaskDto addUserToTask(HandleUserDto request);
+    JpaTask addUserToTask(HandleUserDto request);
 
-    TaskDto removeUserFromTask(HandleUserDto request);
+    JpaTask removeUserFromTask(HandleUserDto request);
 }

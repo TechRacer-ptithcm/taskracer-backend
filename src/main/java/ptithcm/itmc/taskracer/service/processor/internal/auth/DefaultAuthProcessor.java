@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import ptithcm.itmc.taskracer.exception.ResourceNotFound;
 import ptithcm.itmc.taskracer.exception.ValidationFailedException;
 import ptithcm.itmc.taskracer.repository.JpaUserRepository;
+import ptithcm.itmc.taskracer.repository.model.JpaUser;
 import ptithcm.itmc.taskracer.repository.model.enumeration.Gender;
 import ptithcm.itmc.taskracer.repository.model.enumeration.Tier;
 import ptithcm.itmc.taskracer.service.dto.auth.*;
@@ -41,7 +42,7 @@ public class DefaultAuthProcessor implements IAuthProcessor {
 
     @Override
     @Transactional
-    public SignUpResponseDto createNewUser(SignUpRequestDto request) throws MessagingException {
+    public JpaUser createNewUser(SignUpRequestDto request) throws MessagingException {
         var user = UserDto.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
@@ -54,11 +55,7 @@ public class DefaultAuthProcessor implements IAuthProcessor {
                 .build();
         var savedUser = jpaUserRepository.save(userServiceMapper.toJpa(user));
         emailProcessor.sendOtp(userServiceMapper.toDto(savedUser));
-        return SignUpResponseDto.builder()
-                .username(savedUser.getUsername())
-                .email(savedUser.getEmail())
-                .active(savedUser.getActive())
-                .build();
+        return savedUser;
     }
 
     @Override

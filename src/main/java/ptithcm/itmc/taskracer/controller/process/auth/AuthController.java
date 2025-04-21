@@ -70,8 +70,6 @@ public class AuthController {
 
     @PostMapping("verify-account")
     public ResponseEntity<ResponseAPI<?>> verifyAccount(@RequestBody VerifyAccountRequest request) {
-//        var principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        var userData = ParseObject.parse(principal, UserDto.class);
         var data = authService.verifyAccount(request.getOtp());
         var returnData = authControllerMapper.toDomain(data);
         var response = ResponseAPI.builder()

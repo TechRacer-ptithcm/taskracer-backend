@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import ptithcm.itmc.taskracer.repository.JpaUserRepository;
-import ptithcm.itmc.taskracer.service.dto.user.UserDto;
+import ptithcm.itmc.taskracer.repository.model.JpaUser;
 import ptithcm.itmc.taskracer.service.mapper.user.UserServiceMapper;
 import ptithcm.itmc.taskracer.service.provider.IEmailProvider;
 
@@ -20,11 +20,11 @@ public class DefaultEmailProvider implements IEmailProvider {
     private final UserServiceMapper userServiceMapper;
 
     @Override
-    public Optional<UserDto> getUserFromOtp(String otp) throws Exception {
+    public Optional<JpaUser> getUserFromOtp(String otp) throws Exception {
         String key = "otp:" + otp;
         if (!redisTemplate.hasKey(key)) throw new Exception("OTP is not found or already used.");
         String getUsername = (String) redisTemplate.opsForValue().get(key);
         var userData = jpaUserRepository.findByUsername(getUsername).orElseThrow(() -> new Exception("User not found."));
-        return Optional.of(userServiceMapper.toDto(userData));
+        return Optional.of(userData);
     }
 }

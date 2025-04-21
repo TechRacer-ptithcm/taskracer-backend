@@ -11,7 +11,7 @@ import ptithcm.itmc.taskracer.controller.dto.team.CreateNewTeamRequest;
 import ptithcm.itmc.taskracer.controller.dto.team.UpdateTeamRequest;
 import ptithcm.itmc.taskracer.controller.mapper.team.TeamControllerMapper;
 import ptithcm.itmc.taskracer.helper.AuthHelper;
-import ptithcm.itmc.taskracer.service.ITeamService;
+import ptithcm.itmc.taskracer.service.TeamService;
 
 import java.util.UUID;
 
@@ -19,7 +19,7 @@ import java.util.UUID;
 @RequestMapping("social")
 @RequiredArgsConstructor
 public class TeamController {
-    private final ITeamService teamService;
+    private final TeamService teamService;
     private final TeamControllerMapper teamControllerMapper;
     private final AuthHelper authHelper;
 

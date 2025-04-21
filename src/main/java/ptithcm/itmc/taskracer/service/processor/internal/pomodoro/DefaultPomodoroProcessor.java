@@ -37,9 +37,9 @@ public class DefaultPomodoroProcessor implements IPomodoroProcessor {
     public PomodoroDto startPomodoro(UUID userId) {
         String key = "pomodoro::" + userId;
         Long timestamp = Instant.now().getEpochSecond();
-        var existTime = (Integer) redisTemplate.opsForValue().get(key);
-        log.info("exist time: {}", existTime);
-        if (existTime != null) {
+        var existPomodoro = redisTemplate.opsForValue().get(key);
+        log.info("exist time: {}", existPomodoro);
+        if (existPomodoro != null) {
             throw new RuntimeException("Pomodoro is already started.");
         }
         var dataToSave = PomodoroDto.builder()

@@ -1,11 +1,12 @@
 package ptithcm.itmc.taskracer.service.processor;
 
 import jakarta.mail.MessagingException;
+import ptithcm.itmc.taskracer.repository.model.JpaUser;
 import ptithcm.itmc.taskracer.service.dto.auth.*;
 import ptithcm.itmc.taskracer.service.dto.user.UserDto;
 
 public interface IAuthProcessor {
-    SignUpResponseDto createNewUser(SignUpRequestDto request) throws MessagingException;
+    JpaUser createNewUser(SignUpRequestDto request) throws MessagingException;
 
     SignInResponseDto signIn(SignInRequestDto request, UserDto user);
 

@@ -17,7 +17,7 @@ import ptithcm.itmc.taskracer.common.web.response.ErrorObject;
 import ptithcm.itmc.taskracer.common.web.response.ResponseAPI;
 import ptithcm.itmc.taskracer.exception.AuthenticationFailedException;
 import ptithcm.itmc.taskracer.repository.model.enumeration.Tier;
-import ptithcm.itmc.taskracer.service.IUserService;
+import ptithcm.itmc.taskracer.service.UserService;
 import ptithcm.itmc.taskracer.service.dto.user.UserDto;
 import ptithcm.itmc.taskracer.util.jwt.JwtUtil;
 
@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
-@Slf4j
+@Slf4j(topic = "FILTER-JWT")
 @Component
 public class JwtFilter extends OncePerRequestFilter {
     private static final List<String> BYPASS_PATHS = List.of(
@@ -39,7 +39,7 @@ public class JwtFilter extends OncePerRequestFilter {
     );
     private final JwtUtil jwtUtil;
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final IUserService userService;
+    private final UserService userService;
 
     private String extractToken(String authorizationHeader) {
         log.info("Authorization header: {}", authorizationHeader);

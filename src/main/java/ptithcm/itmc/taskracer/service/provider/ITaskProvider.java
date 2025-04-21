@@ -1,12 +1,12 @@
 package ptithcm.itmc.taskracer.service.provider;
 
-import ptithcm.itmc.taskracer.service.dto.task.TaskDto;
+import ptithcm.itmc.taskracer.repository.model.JpaTask;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface ITaskProvider {
-    List<TaskDto> getAllTask(UUID ownerId);
+    List<JpaTask> getAllTask(UUID ownerId);
 
-    TaskDto getTaskById(UUID id, UUID ownerId);
+    JpaTask getTaskById(UUID id, UUID ownerId);
 }
