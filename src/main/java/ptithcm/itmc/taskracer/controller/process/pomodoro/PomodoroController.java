@@ -9,14 +9,14 @@ import org.springframework.web.bind.annotation.RestController;
 import ptithcm.itmc.taskracer.common.web.enumeration.ResponseCode;
 import ptithcm.itmc.taskracer.common.web.response.ResponseAPI;
 import ptithcm.itmc.taskracer.helper.AuthHelper;
-import ptithcm.itmc.taskracer.service.process.pomodoro.IPomodoroService;
+import ptithcm.itmc.taskracer.service.PomodoroService;
 
 @RestController
 @RequestMapping("pomodoro")
 @RequiredArgsConstructor
 public class PomodoroController {
     private final AuthHelper authHelper;
-    private final IPomodoroService pomodoroService;
+    private final PomodoroService pomodoroService;
 
     @PostMapping("start")
     public ResponseEntity<ResponseAPI<?>> startPomodoro() {

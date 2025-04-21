@@ -1,0 +1,20 @@
+package ptithcm.itmc.taskracer.repository.model.enumeration;
+
+public enum Permission {
+    TEAM_ADD_MEMBER,
+    TEAM_REMOVE_MEMBER,
+    TEAM_EDIT_MEMBER_ROLE,
+    TEAM_VIEW_MEMBER,
+    TEAM_CREATE_TASK,
+    TEAM_EDIT_TASK,
+    TEAM_DELETE_TASK,
+    TEAM_VIEW_TASK,
+    TEAM_CREATE_POST,
+    TEAM_EDIT_POST,
+    TEAM_DELETE_POST,
+    TEAM_VIEW_POST,
+    TEAM_MANAGE_SETTINGS,
+    TEAM_VIEW_ACTIVITY,
+    TEAM_ASSIGN_LEADER,
+    TEAM_ARCHIVE
+}

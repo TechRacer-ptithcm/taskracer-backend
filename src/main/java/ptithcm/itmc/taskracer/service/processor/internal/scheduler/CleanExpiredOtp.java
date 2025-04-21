@@ -1,4 +1,4 @@
-package ptithcm.itmc.taskracer.service.process.scheduler;
+package ptithcm.itmc.taskracer.service.processor.internal.scheduler;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

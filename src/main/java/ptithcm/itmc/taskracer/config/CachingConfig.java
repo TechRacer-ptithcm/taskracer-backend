@@ -21,7 +21,7 @@ import java.time.Duration;
 
 @Configuration
 @EnableCaching
-@Slf4j
+@Slf4j(topic = "CONFIG-CACHING")
 public class CachingConfig {
 
     @Value("${spring.data.redis.host}")
@@ -54,6 +54,8 @@ public class CachingConfig {
     @Bean
     public RedisTemplate<String, Object> redisTemplate() {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
+        log.info("redis [{}:{}]", host, port);
+        log.info("redis PING: {}", redisConnectionFactory().getConnection().ping());
         template.setConnectionFactory(redisConnectionFactory());
 
         // Cấu hình serializer để lưu dữ liệu dưới dạng JSON

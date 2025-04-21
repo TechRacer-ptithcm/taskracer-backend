@@ -1,24 +1,23 @@
-package ptithcm.itmc.taskracer.service.process.auth;
+package ptithcm.itmc.taskracer.service.processor.internal.auth;
 
 import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import ptithcm.itmc.taskracer.exception.DuplicateDataException;
-import ptithcm.itmc.taskracer.exception.ExpiredException;
+import org.springframework.stereotype.Component;
 import ptithcm.itmc.taskracer.exception.ResourceNotFound;
 import ptithcm.itmc.taskracer.exception.ValidationFailedException;
 import ptithcm.itmc.taskracer.repository.JpaUserRepository;
+import ptithcm.itmc.taskracer.repository.model.JpaUser;
 import ptithcm.itmc.taskracer.repository.model.enumeration.Gender;
 import ptithcm.itmc.taskracer.repository.model.enumeration.Tier;
 import ptithcm.itmc.taskracer.service.dto.auth.*;
 import ptithcm.itmc.taskracer.service.dto.user.UserDto;
-import ptithcm.itmc.taskracer.service.mapper.tier.TierMapper;
 import ptithcm.itmc.taskracer.service.mapper.user.UserServiceMapper;
+import ptithcm.itmc.taskracer.service.processor.IAuthProcessor;
+import ptithcm.itmc.taskracer.service.processor.IEmailProcessor;
 import ptithcm.itmc.taskracer.util.jwt.AesTokenUtil;
 import ptithcm.itmc.taskracer.util.jwt.JwtUtil;
 
@@ -26,37 +25,16 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.concurrent.TimeUnit;
 
-public interface IAuthService {
-    SignUpResponseDto createNewUser(SignUpRequestDto request) throws MessagingException;
-
-    SignInResponseDto signIn(SignInRequestDto request);
-
-    VerifyAccountDto verifyAccount(String otp);
-
-    void sendOtpForgotPassword(String account) throws MessagingException;
-
-    OtpForgotPasswordDto VerifyChangePassword(String otp) throws Exception;
-
-    void resendOtp(String account) throws MessagingException;
-
-    void changePassword(String token, String newPassword) throws Exception;
-
-    String refreshAccessToken(String token);
-
-}
-
-@Service
+@Component
 @RequiredArgsConstructor
-@Slf4j
-class AuthServiceProcessor implements IAuthService {
+@Slf4j(topic = "SERVICE-AUTH-PROCESSOR")
+public class DefaultAuthProcessor implements IAuthProcessor {
     private final JpaUserRepository jpaUserRepository;
     private final UserServiceMapper userServiceMapper;
     private final PasswordEncoder passwordEncoder;
-    private final TierMapper tierMapper;
     private final JwtUtil jwtUtil;
-    private final IEmailService emailService;
+    private final IEmailProcessor emailProcessor;
     private final AesTokenUtil aesTokenUtil;
-    private final RedisTemplate<String, Object> redisTemplate;
     @Value("${task-racer.expire.hour}")
     private int expireTimeByHour;
     @Value("${task-racer.expire.minute}")
@@ -64,11 +42,7 @@ class AuthServiceProcessor implements IAuthService {
 
     @Override
     @Transactional
-    public SignUpResponseDto createNewUser(SignUpRequestDto request) throws MessagingException {
-        if (jpaUserRepository.findByUsername(request.getUsername()).isPresent() ||
-                jpaUserRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new DuplicateDataException("Username or email already exists.");
-        }
+    public JpaUser createNewUser(SignUpRequestDto request) throws MessagingException {
         var user = UserDto.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
@@ -80,21 +54,13 @@ class AuthServiceProcessor implements IAuthService {
                 .name("")
                 .build();
         var savedUser = jpaUserRepository.save(userServiceMapper.toJpa(user));
-        emailService.sendOtp(userServiceMapper.toDto(savedUser));
-        return SignUpResponseDto.builder()
-                .username(savedUser.getUsername())
-                .email(savedUser.getEmail())
-                .active(savedUser.getActive())
-                .build();
+        emailProcessor.sendOtp(userServiceMapper.toDto(savedUser));
+        return savedUser;
     }
 
     @Override
-    public SignInResponseDto signIn(SignInRequestDto request) {
+    public SignInResponseDto signIn(SignInRequestDto request, UserDto user) {
         Long expiredTime = TimeUnit.HOURS.toMillis(expireTimeByHour);
-        var user = jpaUserRepository.findByUsername(request.getInputAccount())
-                .or(() -> jpaUserRepository.findByEmail(request.getInputAccount()))
-                .orElseThrow(() -> new ResourceNotFound("User not found."));
-
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new ResourceNotFound("Wrong password.");
         }
@@ -103,76 +69,59 @@ class AuthServiceProcessor implements IAuthService {
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .active(user.getActive())
-                .tier(tierMapper.toDto(user.getTier()).getName())
+                .tier(user.getTier())
                 .accessToken(jwtUtil.generateToken(user.getUsername(), expiredTime))
                 .build();
     }
 
     @Override
     @Transactional
-    public VerifyAccountDto verifyAccount(String otp) {
+    public VerifyAccountDto verifyAccount(String username) {
         Long expiredTime = TimeUnit.HOURS.toMillis(expireTimeByHour);
-        String key = "otp:" + otp;
-        if (!redisTemplate.hasKey(key)) throw new ExpiredException("OTP is not found or already used.");
-        String getUsername = (String) (redisTemplate.opsForValue().getAndDelete(key));
-        log.info("otp get username: {}", getUsername);
-        var userData = jpaUserRepository.findByUsername(getUsername);
+        log.info("Get username: {}", username);
+        var userData = jpaUserRepository.findByUsername(username);
         if (userData.isEmpty()) throw new ResourceNotFound("User not found.");
         userData.ifPresent(jpaUser -> jpaUser.setActive(true));
         return VerifyAccountDto.builder()
                 .message("Verify account successfully.")
-                .accessToken(jwtUtil.generateToken(getUsername, expiredTime))
+                .accessToken(jwtUtil.generateToken(username, expiredTime))
                 .build();
     }
 
     @Override
-    @Transactional
-    public void sendOtpForgotPassword(String account) throws MessagingException {
-        var user = jpaUserRepository.findByEmail(account)
-                .or(() -> jpaUserRepository.findByUsername(account))
-                .orElseThrow(() -> new ResourceNotFound("Email or username not found."));
-        emailService.sendOtp(userServiceMapper.toDto(user));
+    public void sendOtpForgotPassword(UserDto user) throws MessagingException {
+        emailProcessor.sendOtp(user);
     }
 
     @Override
-    public OtpForgotPasswordDto VerifyChangePassword(String otp) throws Exception {
-        String key = "otp:" + otp;
-        var userData = emailService.getUserFromOtp(otp).orElseThrow(() -> new ExpiredException("OTP is not found or already used."));
-        String getUsername = (String) redisTemplate.opsForValue().get(key);
-        log.info(getUsername);
+    public OtpForgotPasswordDto VerifyChangePassword(UserDto user) throws Exception {
         var expiredTime = LocalDateTime.now()
                 .plusMinutes(expireTimeByMinute)
                 .atZone(ZoneId.systemDefault())
                 .toInstant()
                 .toEpochMilli();
         log.info("timestamp: {}", expiredTime);
-        var token = aesTokenUtil.encrypt(userData.getUsername(), userData.getEmail(), expiredTime);
+        var token = aesTokenUtil.encrypt(user.getUsername(), user.getEmail(), expiredTime);
         var result = OtpForgotPasswordDto.builder()
                 .privateToken(token)
                 .build();
         log.info(token);
-//        jpaOtpRepository.delete(otpData);
         return result;
     }
 
-
     @Override
-    public void resendOtp(String account) throws MessagingException {
-        var user = jpaUserRepository.findByEmail(account)
-                .or(() -> jpaUserRepository.findByUsername(account))
-                .orElseThrow(() -> new ResourceNotFound("Email or username not found."));
-        emailService.sendOtp(userServiceMapper.toDto(user));
+    public void resendOtp(UserDto user) throws MessagingException {
+        emailProcessor.sendOtp(user);
     }
 
     @Override
-    @Transactional
     public void changePassword(String token, String newPassword) throws Exception {
         String[] resultData = aesTokenUtil.decrypt(token);
-        var userData = jpaUserRepository.findByUsername(resultData[0])
+        var user = jpaUserRepository.findByUsername(resultData[0])
                 .or(() -> jpaUserRepository.findByEmail(resultData[1]))
                 .orElseThrow(() -> new ResourceNotFound("User not found."));
-        userData.setPassword(passwordEncoder.encode(newPassword));
-        jpaUserRepository.save(userData);
+        user.setPassword(passwordEncoder.encode(newPassword));
+        jpaUserRepository.save(user);
     }
 
     @Override
