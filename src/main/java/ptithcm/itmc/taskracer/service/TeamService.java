@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import ptithcm.itmc.taskracer.common.web.response.PageableObject;
 import ptithcm.itmc.taskracer.service.dto.team.TeamDto;
 import ptithcm.itmc.taskracer.service.mapper.team.TeamServiceMapper;
+import ptithcm.itmc.taskracer.service.processor.ITeamMemberProcessor;
 import ptithcm.itmc.taskracer.service.processor.ITeamProcessor;
 import ptithcm.itmc.taskracer.service.provider.ITeamProvider;
 
@@ -18,11 +19,12 @@ import java.util.UUID;
 public class TeamService {
     private final ITeamProcessor processor;
     private final ITeamProvider provider;
+    private final ITeamMemberProcessor memberProcessor;
     private final TeamServiceMapper mapper;
 
     @Transactional
     public TeamDto createNewTeam(TeamDto teamDto, UUID ownerId) {
-        var data = provider.getTeamBySlug(teamDto.getSlug());
+        var data = processor.create(teamDto, ownerId);
         return mapper.toDto(data);
     }
 
@@ -53,42 +55,36 @@ public class TeamService {
 
     @Transactional
     public void removeUserFromTeam(String slug, UUID userId, UUID removedUserId) {
-        processor.removeUser(slug, userId, removedUserId);
+        memberProcessor.remove(slug, userId, removedUserId);
     }
 
-    
     @Transactional
     public void inviteUserToTeam(String slug, UUID userId, UUID invitedUserId) {
-        processor.inviteUser(slug, userId, invitedUserId);
+        memberProcessor.invite(slug, userId, invitedUserId);
     }
 
-    
     @Transactional
     public void acceptInvite(String slug, UUID userId) {
-        processor.acceptInvite(slug, userId);
+        memberProcessor.accept(slug, userId);
     }
 
-    
     @Transactional
     public void rejectInvite(String slug, UUID userId) {
-        processor.rejectInvite(slug, userId);
+        memberProcessor.reject(slug, userId);
     }
 
-    
     @Transactional
     public void leaveTeam(String slug, UUID userId) {
-        processor.leaveTeam(slug, userId);
+        memberProcessor.leave(slug, userId);
     }
 
-    
     @Transactional
     public void joinTeam(String slug, UUID userId) {
-        processor.joinTeam(slug, userId);
+        memberProcessor.join(slug, userId);
     }
 
-    
     @Transactional
     public void requestToJoinTeam(String slug, UUID userId) {
-        processor.rejectInvite(slug, userId);
+        memberProcessor.reject(slug, userId);
     }
 }
