@@ -76,7 +76,7 @@ public class DefaultAuthProcessor implements IAuthProcessor {
 
     @Override
     @Transactional
-    public VerifyAccountDto verifyAccount(String username) {
+    public VerifyAccountDto active(String username) {
         Long expiredTime = TimeUnit.HOURS.toMillis(expireTimeByHour);
         log.info("Get username: {}", username);
         var userData = jpaUserRepository.findByUsername(username);

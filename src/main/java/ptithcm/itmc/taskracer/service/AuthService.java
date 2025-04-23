@@ -50,8 +50,9 @@ public class AuthService {
     public VerifyAccountDto verifyAccount(String otp) {
         String key = "otp:" + otp;
         if (!redisTemplate.hasKey(key)) throw new ExpiredException("OTP is not found or already used.");
-        String getUsername = (String) (redisTemplate.opsForValue().getAndDelete(key));
-        return processor.verifyAccount(getUsername);
+        String getUsername = (String) (redisTemplate.opsForValue().get(key));
+        redisTemplate.delete(key);
+        return processor.active(getUsername);
     }
 
     @Transactional

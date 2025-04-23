@@ -10,7 +10,7 @@ public interface IAuthProcessor {
 
     SignInResponseDto signIn(SignInRequestDto request, UserDto user);
 
-    VerifyAccountDto verifyAccount(String username);
+    VerifyAccountDto active(String username);
 
     void sendOtpForgotPassword(UserDto user) throws MessagingException;
 

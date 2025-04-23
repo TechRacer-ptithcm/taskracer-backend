@@ -1,4 +1,6 @@
 package ptithcm.itmc.taskracer.service.provider.internal.pomodoro;
 
-public class DefaultPomodoroProvider {
+import ptithcm.itmc.taskracer.service.provider.IPomodoroProvider;
+
+public class DefaultPomodoroProvider implements IPomodoroProvider {
 }
