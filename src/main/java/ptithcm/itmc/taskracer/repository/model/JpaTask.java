@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import ptithcm.itmc.taskracer.repository.model.enumeration.Priority;
 import ptithcm.itmc.taskracer.repository.model.enumeration.ResourceType;
 import ptithcm.itmc.taskracer.repository.model.enumeration.TaskStatus;
+import ptithcm.itmc.taskracer.repository.model.enumeration.TaskType;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -56,4 +57,8 @@ public class JpaTask {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private TaskStatus status;
+
+    @Column(name = "task_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private TaskType taskType;
 }

@@ -85,6 +85,6 @@ public class TeamService {
 
     @Transactional
     public void requestToJoinTeam(String slug, UUID userId) {
-        memberProcessor.reject(slug, userId);
+        memberProcessor.requestToJoin(slug, userId);
     }
 }

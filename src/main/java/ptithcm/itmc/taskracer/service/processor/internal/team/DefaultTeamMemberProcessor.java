@@ -76,6 +76,9 @@ public class DefaultTeamMemberProcessor implements ITeamMemberProcessor {
                 .findByTeamIdAndUserId(findTeam.getId(), userId)
                 .orElseThrow(() -> new RoleInsufficientException("You have not been invited to this team."));
         findInvite.setStatus(InviteStatus.ACCEPTED);
+        if(!findInvite.getUser().getId().equals(userId)) {
+            throw new RoleInsufficientException("You are not allowed to accept this invitation.");
+        }
         var dataToSaveDto = TeamMemberDto.builder()
                 .userId(userId)
                 .teamId(findTeam.getId())
@@ -136,13 +139,19 @@ public class DefaultTeamMemberProcessor implements ITeamMemberProcessor {
 
     @Override
     public void requestToJoin(String slug, UUID userId) {
+        log.info("find team by slug: {}", slug);
         var findTeam = teamServiceMapper.toDto(jpaTeamRepository
                 .findBySlug(slug)
                 .orElseThrow(() -> new ResourceNotFound("Team slug not found.")));
-        var existingUser = jpaTeamMemberRepository.findByUserIdAndTeamId(userId, findTeam.getId());
-        if (existingUser.isPresent()) {
-            throw new DuplicateDataException("You are already a member of this team.");
-        }
+        log.info("Find invitation by user_id: {}", userId);
+        jpaTeamMemberRepository.findByUserIdAndTeamId(userId, findTeam.getId())
+                .ifPresent(teamMember -> {
+                    throw new DuplicateDataException("You are already a member of this team.");
+                });
+        jpaTeamInviteHistoryRepository.findByTeamIdAndUserId(findTeam.getId(), userId)
+                .ifPresent(invite -> {
+                   throw new DuplicateDataException("You have already requested to join this team.");
+        });
         var dataToSave = TeamInviteHistoryDto.builder()
                 .user(userId)
                 .team(findTeam.getId())

@@ -1,7 +1,6 @@
 package ptithcm.itmc.taskracer.repository.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import ptithcm.itmc.taskracer.repository.model.enumeration.InviteStatus;
 
@@ -16,6 +15,7 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = true)
 public class JpaTeamInviteHistory extends Auditable{
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @ManyToOne

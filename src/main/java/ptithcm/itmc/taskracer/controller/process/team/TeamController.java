@@ -156,4 +156,17 @@ public class TeamController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(resp);
     }
+
+    @PostMapping("team/{slug}/request")
+    public ResponseEntity<ResponseAPI<?>> requestJoinTeam(@PathVariable String slug) {
+        var getUser = authHelper.getUser();
+        teamService.requestToJoinTeam(slug, getUser.getId());
+        var resp = ResponseAPI.builder()
+               .code(ResponseCode.SUCCESS.getCode())
+               .message(ResponseCode.SUCCESS.getMessage())
+               .status(true)
+               .data(new ResponseMessage("Request join team: " + slug + " successful"))
+               .build();
+        return ResponseEntity.status(HttpStatus.OK).body(resp);
+    }
 }

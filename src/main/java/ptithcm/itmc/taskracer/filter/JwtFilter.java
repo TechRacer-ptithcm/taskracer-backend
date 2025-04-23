@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -22,9 +23,9 @@ import ptithcm.itmc.taskracer.service.dto.user.UserDto;
 import ptithcm.itmc.taskracer.util.jwt.JwtUtil;
 
 import java.io.IOException;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Slf4j(topic = "FILTER-JWT")
@@ -71,16 +72,11 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
         try {
+            //Generate trace id
+            String traceId = UUID.randomUUID().toString(); // hoặc lấy từ header nếu có trace-id từ client
+            MDC.put("trace.id", traceId);
             String requestUri = request.getRequestURI();
-            log.info(">>> URI: {}", requestUri);
             // Log ra header
-            log.info(">>> Method: {}", request.getMethod());
-            Enumeration<String> headerNames = request.getHeaderNames();
-            while (headerNames.hasMoreElements()) {
-                String headerName = headerNames.nextElement();
-                String headerValue = request.getHeader(headerName);
-                log.info(">>> Header: {} = {}", headerName, headerValue);
-            }
             //Bypass OPTIONS
             if (request.getMethod().equals("OPTIONS")) {
                 filterChain.doFilter(request, response);
@@ -145,6 +141,9 @@ public class JwtFilter extends OncePerRequestFilter {
                             .build()
             );
             response.getWriter().write(errorBody);
+        }
+        finally {
+            MDC.remove("trace.id");
         }
     }
 }
