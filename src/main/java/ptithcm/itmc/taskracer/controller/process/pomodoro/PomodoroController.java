@@ -5,12 +5,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ptithcm.itmc.taskracer.common.web.enumeration.ResponseCode;
 import ptithcm.itmc.taskracer.common.web.response.ResponseAPI;
 import ptithcm.itmc.taskracer.helper.AuthHelper;
 import ptithcm.itmc.taskracer.service.PomodoroService;
+import java.util.Map;
 
 @RestController
 @RequestMapping("pomodoro")
@@ -20,9 +22,9 @@ public class PomodoroController {
     private final PomodoroService pomodoroService;
 
     @PostMapping("start")
-    public ResponseEntity<ResponseAPI<?>> startPomodoro() {
+    public ResponseEntity<ResponseAPI<?>> startPomodoro(@RequestBody Map<String, Long> request) {
         var userData = authHelper.getUser();
-        var data = pomodoroService.startPomodoro(userData.getId());
+        var data = pomodoroService.startPomodoro(userData.getId(), request.get("endTime"));
         var result = ResponseAPI.builder()
                 .data(data)
                 .code(ResponseCode.SUCCESS.getCode())
@@ -31,7 +33,6 @@ public class PomodoroController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
-
 
     @PostMapping("stop")
     public ResponseEntity<ResponseAPI<?>> stopPomodoro() {
