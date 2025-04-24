@@ -25,4 +25,8 @@ public class PomodoroService {
     public PomodoroDto stopPomodoro(UUID userId) {
         return processor.stopPomodoro(userId);
     }
+
+    public PomodoroDto getStartTime(UUID userId) {
+        return processor.getStartTime(userId);
+    }
 }

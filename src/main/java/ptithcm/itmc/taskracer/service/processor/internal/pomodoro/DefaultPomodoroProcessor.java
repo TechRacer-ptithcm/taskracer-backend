@@ -88,4 +88,16 @@ public class DefaultPomodoroProcessor implements IPomodoroProcessor {
         log.info("pomodoro:: time: {} - {}", getPomodoroTime.getStartTime(), getPomodoroTime.getCheckpointTime());
         return getPomodoroTime;
     }
+
+    @Override
+    public PomodoroDto getStartTime(UUID userId) {
+        String key = "pomodoro::" + userId;        
+        var rawData = redisTemplate.opsForValue().get(key);
+        if (rawData == null) {
+            log.info("No active pomodoro session found for user: {}", userId);
+            return null;
+        }
+        var pomodoroDto = ParseObject.parse(rawData, PomodoroDto.class);
+        return pomodoroDto;
+    }
 }

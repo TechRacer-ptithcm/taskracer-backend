@@ -3,6 +3,7 @@ package ptithcm.itmc.taskracer.controller.process.pomodoro;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -49,6 +50,19 @@ public class PomodoroController {
     public ResponseEntity<ResponseAPI<?>> checkpointPomodoro() {
         var userData = authHelper.getUser();
         var data = pomodoroService.checkpoint(userData.getId());
+        var result = ResponseAPI.builder()
+                .data(data)
+                .code(ResponseCode.SUCCESS.getCode())
+                .message(ResponseCode.SUCCESS.getMessage())
+                .status(true)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
+
+    @GetMapping()
+    public ResponseEntity<ResponseAPI<?>> getStartTime() {
+        var userData = authHelper.getUser();
+        var data = pomodoroService.getStartTime(userData.getId());
         var result = ResponseAPI.builder()
                 .data(data)
                 .code(ResponseCode.SUCCESS.getCode())
