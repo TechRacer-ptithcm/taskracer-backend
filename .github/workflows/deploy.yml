@@ -23,6 +23,12 @@ jobs:
             exit 1
           fi
 
+      - name: Add VPS to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
+
+
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.8.0
         with:
