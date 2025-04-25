@@ -42,21 +42,32 @@ jobs:
         run: |
           rsync -avz --exclude '.git' ./ ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }}:/root/app
 
-      - name: SSH and deploy via Dockerfile with secrets
+      - name: Check docker container
         run: |
           ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }} << "EOF"
             cd /root/app
+            echo "Check docker container exists: taskracer"
+            if [ "$(docker ps -aq -f name=taskracer)" ]; then
+            echo "Stopping existing container 'taskracer'..."
+            docker stop taskracer
+            echo "Removing existing container 'taskracer'..."
+            docker rm taskracer
+            else
+           echo "No existing container 'taskracer' found."
+           fi
+          EOF
 
-            echo "Stopping old container..."
-            docker stop taskracer || true
-            docker rm taskracer || true
-
+      - name: SSH and deploy via Dockerfile with secrets
+        run: |
+          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }} << EOF
+            cd /root/app
             echo "Building Docker image..."
             docker build -t taskracer:${IMAGE_TAG} .
 
             echo "Running new container with -e secrets..."
             docker run -d --name taskracer \
               -p 8080:8080 \
+              -e SPRING_PROFILES_ACTIVE=docker\
               -e JDBC_URL="${{ secrets.JDBC_URL }}" \
               -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
               -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
