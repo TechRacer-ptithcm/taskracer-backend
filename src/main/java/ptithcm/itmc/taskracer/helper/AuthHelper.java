@@ -8,13 +8,14 @@ import ptithcm.itmc.taskracer.exception.AuthenticationFailedException;
 import ptithcm.itmc.taskracer.service.dto.user.UserDto;
 import ptithcm.itmc.taskracer.util.json.ParseObject;
 
-@Slf4j
 @Component
 @RequiredArgsConstructor
+@Slf4j(topic = "AUTH-HELPER")
 public class AuthHelper {
     public UserDto getUser() {
         var principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var userData = ParseObject.parse(principal, UserDto.class);
+        log.info("Get user: {}", userData);
         if (!userData.getActive()) {
             throw new AuthenticationFailedException("User is not active.");
         }

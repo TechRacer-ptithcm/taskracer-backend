@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20250412235700-1" author="VinhNguyenD23">
+        <insert tableName="rank_data" schemaName="social">
+            <column name="name" value="BRONZER"/>
+            <column name="order" valueNumeric="1"/>
+            <column name="star_per_tier" valueNumeric="3"/>
+            <column name="point_per_star" valueNumeric="1"/>
+        </insert>
+        <insert tableName="rank_data" schemaName="social">
+            <column name="name" value="SILVER"/>
+            <column name="order" valueNumeric="2"/>
+            <column name="star_per_tier" valueNumeric="3"/>
+            <column name="point_per_star" valueNumeric="1"/>
+        </insert>
+        <insert tableName="rank_data" schemaName="social">
+            <column name="name" value="GOLD"/>
+            <column name="order" valueNumeric="3"/>
+            <column name="star_per_tier" valueNumeric="3"/>
+            <column name="point_per_star" valueNumeric="1"/>
+        </insert>
+        <insert tableName="rank_data" schemaName="social">
+            <column name="name" value="PLATINUM"/>
+            <column name="order" valueNumeric="4"/>
+            <column name="star_per_tier" valueNumeric="3"/>
+            <column name="point_per_star" valueNumeric="1"/>
+        </insert>
+        <insert tableName="rank_data" schemaName="social">
+            <column name="name" value="DIAMOND"/>
+            <column name="order" valueNumeric="5"/>
+            <column name="star_per_tier" valueNumeric="3"/>
+            <column name="point_per_star" valueNumeric="1"/>
+        </insert>
+        <insert tableName="rank_data" schemaName="social">
+            <column name="name" value="HEROIC"/>
+            <column name="order" valueNumeric="6"/>
+            <column name="star_per_tier" valueNumeric="5"/>
+            <column name="point_per_star" valueNumeric="1"/>
+        </insert>
+        <insert tableName="rank_data" schemaName="social">
+            <column name="name" value="CONQUEROR"/>
+            <column name="order" valueNumeric="7"/>
+            <column name="star_per_tier" valueNumeric="5"/>
+            <column name="point_per_star" valueNumeric="2"/>
+        </insert>
+        <insert tableName="rank_data" schemaName="social">
+            <column name="name" value="MASTER"/>
+            <column name="order" valueNumeric="8"/>
+            <column name="star_per_tier" valueNumeric="5"/>
+            <column name="point_per_star" valueNumeric="2"/>
+        </insert>
+        <insert tableName="rank_data" schemaName="social">
+            <column name="name" value="GRANDMASTER"/>
+            <column name="order" valueNumeric="9"/>
+            <column name="star_per_tier" valueNumeric="5"/>
+            <column name="point_per_star" valueNumeric="2"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+
+    <changeSet id="20250409173000-1" author="VinhNguyenD23">
+        <dropAllForeignKeyConstraints baseTableName="role_permissions" baseTableSchemaName="social"/>
+
+        <dropPrimaryKey tableName="roles" schemaName="social"/>
+        <dropColumn tableName="roles" columnName="id" schemaName="social"/>
+
+        <dropPrimaryKey tableName="permissions" schemaName="social"/>
+        <dropColumn tableName="permissions" columnName="id" schemaName="social"/>
+
+        <dropColumn tableName="role_permissions" columnName="role_id" schemaName="social"/>
+        <dropColumn tableName="role_permissions" columnName="permission_id" schemaName="social"/>
+    </changeSet>
+
+    <changeSet id="20250409173000-2" author="VinhNguyenD23">
+        <addColumn tableName="roles" schemaName="social">
+            <column name="id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+        </addColumn>
+
+        <addColumn tableName="permissions" schemaName="social">
+            <column name="id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+        </addColumn>
+
+        <addColumn tableName="role_permissions" schemaName="social">
+            <column name="permission_id" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <addColumn tableName="role_permissions" schemaName="social">
+            <column name="role_id" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20250409173000-3" author="VinhNguyenD23">
+        <addPrimaryKey
+                tableName="role_permissions"
+                columnNames="role_id, permission_id"
+                constraintName="pk_role_permissions"/>
+
+        <addForeignKeyConstraint
+                baseTableName="role_permissions"
+                baseColumnNames="role_id"
+                constraintName="fk_role_permissions_role"
+                referencedTableName="roles"
+                referencedColumnNames="id"
+                onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint
+                baseTableName="role_permissions"
+                baseColumnNames="permission_id"
+                constraintName="fk_role_permissions_permission"
+                referencedTableName="permissions"
+                referencedColumnNames="id"
+                onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="20250409173000-4" author="VinhNguyenD23">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*)
+                FROM information_schema.columns
+                WHERE table_schema = 'social'
+                  AND table_name = 'roles'
+                  AND column_name = 'team_id';
+            </sqlCheck>
+        </preConditions>
+        <dropColumn tableName="roles"
+                    columnName="team_id"
+                    schemaName="social"/>
+    </changeSet>
+</databaseChangeLog>

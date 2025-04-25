@@ -34,7 +34,7 @@ public interface UserServiceMapper {
     }
 
     @Named("toSetUsersDto")
-    default Set<UserDto> toSetUserDto(Set<JpaUser> request) {
+    default Set<UserDto> toDto(Set<JpaUser> request) {
         if (request == null) {
             return Collections.emptySet();
         }

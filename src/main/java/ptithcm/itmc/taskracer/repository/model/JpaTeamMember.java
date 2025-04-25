@@ -13,8 +13,9 @@ import java.util.UUID;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "team_members", schema = "social")
-public class JpaTeamMember extends Auditable{
+public class JpaTeamMember extends Auditable {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @ManyToOne

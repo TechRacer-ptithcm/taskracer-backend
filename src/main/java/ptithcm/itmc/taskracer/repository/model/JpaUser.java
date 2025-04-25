@@ -7,6 +7,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import ptithcm.itmc.taskracer.repository.model.enumeration.Gender;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -18,6 +19,7 @@ import java.util.UUID;
 @DynamicUpdate
 @DynamicInsert
 @EqualsAndHashCode(callSuper = true)
+@ToString(exclude = {"teams"})
 @Table(name = "users", schema = "social")
 public class JpaUser extends Auditable {
     @Id
@@ -55,4 +57,9 @@ public class JpaUser extends Auditable {
 
     @ManyToMany(mappedBy = "users")
     private Set<JpaTeam> teams;
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, tier, streak, username, password, email, active, name, gender, birth);
+    }
 }

@@ -4,12 +4,14 @@ import lombok.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 import ptithcm.itmc.taskracer.repository.model.JpaTeam;
 import ptithcm.itmc.taskracer.repository.model.enumeration.Visibility;
 
 import java.util.Optional;
 import java.util.UUID;
 
+@Repository
 public interface JpaTeamRepository extends JpaRepository<JpaTeam, UUID> {
     Optional<JpaTeam> findBySlug(String slug);
 

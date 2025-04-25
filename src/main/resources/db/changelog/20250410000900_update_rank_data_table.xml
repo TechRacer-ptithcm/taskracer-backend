@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20250410000900-1" author="VinhNguyenD23">
+        <!--delete old foreign key-->
+        <dropForeignKeyConstraint
+                baseTableName="rankings"
+                constraintName="fk_rankings_rank_data"/>
+        <!--delete old table-->
+        <dropTable tableName="rank_data" schemaName="social"/>
+
+        <!--Create new table, Update column-->
+        <createTable tableName="rank_data" schemaName="social">
+            <column name="id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="order" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="star_per_tier" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="point_per_star" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

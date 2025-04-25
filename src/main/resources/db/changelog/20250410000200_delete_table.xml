@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20250410000200-1" author="VinhNguyenD23">
+        <dropTable tableName="rank_per_day" schemaName="social"/>
+        <dropTable tableName="rank_per_month" schemaName="social"/>
+        <dropTable tableName="rank_per_week" schemaName="social"/>
+        <dropTable tableName="rank_per_year" schemaName="social"/>
+    </changeSet>
+
+    <changeSet id="20250410000200-2" author="VinhNguyenD23">
+        <dropTable tableName="contributions" schemaName="social"/>
+    </changeSet>
+</databaseChangeLog>

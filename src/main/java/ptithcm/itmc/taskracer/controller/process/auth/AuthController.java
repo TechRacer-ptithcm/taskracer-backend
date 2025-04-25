@@ -20,7 +20,7 @@ import ptithcm.itmc.taskracer.controller.dto.auth.*;
 import ptithcm.itmc.taskracer.controller.mapper.auth.AuthControllerMapper;
 import ptithcm.itmc.taskracer.exception.MissingFieldException;
 import ptithcm.itmc.taskracer.exception.ResourceNotFound;
-import ptithcm.itmc.taskracer.service.process.auth.IAuthService;
+import ptithcm.itmc.taskracer.service.AuthService;
 import ptithcm.itmc.taskracer.util.jwt.CookieUtil;
 import ptithcm.itmc.taskracer.util.jwt.JwtUtil;
 
@@ -30,7 +30,7 @@ import ptithcm.itmc.taskracer.util.jwt.JwtUtil;
 @RequiredArgsConstructor
 @Slf4j
 public class AuthController {
-    private final IAuthService authService;
+    private final AuthService authService;
     private final AuthControllerMapper authControllerMapper;
     private final JwtUtil jwtUtil;
     @Value("${task-racer.expire.day}")
@@ -70,8 +70,6 @@ public class AuthController {
 
     @PostMapping("verify-account")
     public ResponseEntity<ResponseAPI<?>> verifyAccount(@RequestBody VerifyAccountRequest request) {
-//        var principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        var userData = ParseObject.parse(principal, UserDto.class);
         var data = authService.verifyAccount(request.getOtp());
         var returnData = authControllerMapper.toDomain(data);
         var response = ResponseAPI.builder()

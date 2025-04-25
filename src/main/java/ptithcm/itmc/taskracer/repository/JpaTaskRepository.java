@@ -1,6 +1,7 @@
 package ptithcm.itmc.taskracer.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 import ptithcm.itmc.taskracer.repository.model.JpaTask;
 import ptithcm.itmc.taskracer.repository.model.JpaUser;
 
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Repository
 public interface JpaTaskRepository extends JpaRepository<JpaTask, UUID> {
     List<JpaTask> findByOwner(UUID ownerId);
 

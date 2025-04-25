@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ptithcm.itmc.taskracer.repository.model.enumeration.Visibility;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -19,6 +20,6 @@ public class TeamDto {
     private String name;
     private UUID ownerId;
     private Visibility visibility;
-    private Set<UUID> users;
+    private Set<UUID> users = new HashSet<>();
 
 }
