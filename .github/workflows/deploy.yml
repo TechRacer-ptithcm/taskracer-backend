@@ -36,7 +36,7 @@ jobs:
 
       - name: Test SSH connection to VPS
         run: |
-          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }} " VPS uptime"
+          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }}
 
       - name: Sync code to VPS
         run: |
