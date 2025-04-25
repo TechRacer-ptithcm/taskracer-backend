@@ -24,7 +24,8 @@ public class PomodoroController {
     @PostMapping("start")
     public ResponseEntity<ResponseAPI<?>> startPomodoro(@RequestBody Map<String, Long> request) {
         var userData = authHelper.getUser();
-        var data = pomodoroService.startPomodoro(userData.getId(), request.get("endTime"));
+        Long endTime = request.get("endTime");
+        var data = pomodoroService.startPomodoro(userData.getId(), endTime);
         var result = ResponseAPI.builder()
                 .data(data)
                 .code(ResponseCode.SUCCESS.getCode())
