@@ -87,4 +87,8 @@ public class TeamService {
     public void requestToJoinTeam(String slug, UUID userId) {
         memberProcessor.requestToJoin(slug, userId);
     }
+
+    public void acceptRequest(String slug, UUID userId, UUID requestUserId) {
+        memberProcessor.acceptRequest(slug, userId, requestUserId);
+    }
 }

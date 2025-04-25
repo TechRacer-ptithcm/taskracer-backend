@@ -53,8 +53,3 @@ management:
     metrics:
       export:
         enabled: true
-logging:
-  logstash:
-    enabled: false
-    host: 160.191.87.204
-    port: 5000

@@ -1,0 +1,60 @@
+name: Deploy TaskRacer
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Extract Tag from GITHUB_REF
+        id: extract_tag
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            TAG_NAME=${GITHUB_REF#refs/tags/}
+            echo "IMAGE_TAG=${TAG_NAME}" >> $GITHUB_ENV
+          else
+            echo "Not a tag reference: ${GITHUB_REF}"
+            exit 1
+          fi
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.VPS_KEY }}
+
+      - name: Sync code to VPS
+        run: |
+          rsync -avz --exclude '.git' ./ ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }}:/root/app
+
+      - name: SSH and deploy via Dockerfile with secrets
+        run: |
+          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }} << "EOF"
+            cd /root/app
+
+            echo "Stopping old container..."
+            docker stop taskracer || true
+            docker rm taskracer || true
+
+            echo "Building Docker image..."
+            docker build -t taskracer:${IMAGE_TAG} .
+
+            echo "Running new container with -e secrets..."
+            docker run -d --name taskracer \
+              -p 8080:8080 \
+              -e JDBC_URL="${{ secrets.JDBC_URL }}" \
+              -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
+              -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
+              -e EMAIL_USERNAME="${{ secrets.EMAIL_USERNAME }}" \
+              -e EMAIL_PASSWORD="${{ secrets.EMAIL_PASSWORD }}" \
+              -e REDIS_HOST="${{ secrets.REDIS_HOST }}" \
+              -e REDIS_PORT="${{ secrets.REDIS_PORT }}" \
+              -e LOGGING_HOST="${{ secrets.LOGGING_HOST }}" \
+              -e LOGGING_PORT="${{ secrets.LOGGING_PORT }}" \
+              taskracer:${IMAGE_TAG}
+          EOF

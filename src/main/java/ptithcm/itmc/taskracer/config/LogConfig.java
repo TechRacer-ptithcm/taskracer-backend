@@ -17,13 +17,13 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j(topic = "LOG-CONFIG")
 public class LogConfig {
 
-    @Value("${logging.logstash.enabled}")
+    @Value("${logging.logstash.enabled:false}")
     private boolean logstashEnabled;
 
-    @Value("${logging.logstash.host}")
+    @Value("${logging.logstash.host:localhost}")
     private String logstashHost;
 
-    @Value("${logging.logstash.port}")
+    @Value("${logging.logstash.port:5000}")
     private int logstashPort;
 
     @PostConstruct

@@ -16,4 +16,6 @@ public interface ITeamMemberProcessor {
     void join(String slug, UUID userId);
 
     void requestToJoin(String slug, UUID userId);
+
+    void acceptRequest(String slug, UUID userId, UUID requestUserId);
 }
