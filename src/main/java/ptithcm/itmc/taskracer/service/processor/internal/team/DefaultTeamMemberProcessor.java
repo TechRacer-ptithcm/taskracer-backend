@@ -10,10 +10,7 @@ import ptithcm.itmc.taskracer.repository.JpaRoleRepository;
 import ptithcm.itmc.taskracer.repository.JpaTeamInviteHistoryRepository;
 import ptithcm.itmc.taskracer.repository.JpaTeamMemberRepository;
 import ptithcm.itmc.taskracer.repository.JpaTeamRepository;
-import ptithcm.itmc.taskracer.repository.model.enumeration.InviteStatus;
-import ptithcm.itmc.taskracer.repository.model.enumeration.Permission;
-import ptithcm.itmc.taskracer.repository.model.enumeration.Role;
-import ptithcm.itmc.taskracer.repository.model.enumeration.Visibility;
+import ptithcm.itmc.taskracer.repository.model.enumeration.*;
 import ptithcm.itmc.taskracer.service.dto.team.TeamInviteHistoryDto;
 import ptithcm.itmc.taskracer.service.dto.team.TeamMemberDto;
 import ptithcm.itmc.taskracer.service.mapper.team.TeamInviteHistoryServiceMapper;
@@ -58,7 +55,7 @@ public class DefaultTeamMemberProcessor implements ITeamMemberProcessor {
         var findInvite = jpaTeamInviteHistoryRepository
                 .findByTeamIdAndUserIdAndStatus(findTeam.getId(), invitedUserId, InviteStatus.PENDING);
         if (findInvite.isPresent()) {
-            throw new DuplicateDataException("User has been request to join this team.");
+            throw new DuplicateDataException("User has already requested to join this team.");
         }
 
         if (!findTeam.getOwnerId().equals(userId)) {
@@ -68,6 +65,7 @@ public class DefaultTeamMemberProcessor implements ITeamMemberProcessor {
                 .user(invitedUserId)
                 .team(findTeam.getId())
                 .status(InviteStatus.PENDING)
+                .type(InviteStatusType.INVITE)
                 .build();
         jpaTeamInviteHistoryRepository.save(teamInviteHistoryServiceMapper.toJpa(dataToSave));
     }
@@ -80,10 +78,10 @@ public class DefaultTeamMemberProcessor implements ITeamMemberProcessor {
         var findInvite = jpaTeamInviteHistoryRepository
                 .findByTeamIdAndUserIdAndStatus(findTeam.getId(), userId, InviteStatus.PENDING)
                 .orElseThrow(() -> new RoleInsufficientException("You have not been invited to this team."));
-        findInvite.setStatus(InviteStatus.ACCEPTED);
         if(!findInvite.getUser().getId().equals(userId)) {
             throw new RoleInsufficientException("You are not allowed to accept this invitation.");
         }
+        findInvite.setStatus(InviteStatus.ACCEPTED);
         var dataToSaveDto = TeamMemberDto.builder()
                 .userId(userId)
                 .teamId(findTeam.getId())
@@ -130,13 +128,17 @@ public class DefaultTeamMemberProcessor implements ITeamMemberProcessor {
         if (findTeam.getVisibility() == Visibility.PRIVATE) {
             throw new RoleInsufficientException("This team is private.");
         }
-        if (jpaTeamMemberRepository.findByUserIdAndTeamId(userId, findTeam.getId()).isPresent()) {
-            throw new DuplicateDataException("You are already a member of this team.");
-        }
         var dataToSaveDto = TeamMemberDto.builder()
                 .userId(userId)
                 .teamId(findTeam.getId())
                 .build();
+        var logData = TeamInviteHistoryDto.builder()
+                .user(userId)
+                .team(findTeam.getId())
+                .status(InviteStatus.ACCEPTED)
+                .type(InviteStatusType.AUTOJOIN)
+                .build();
+        jpaTeamInviteHistoryRepository.save(teamInviteHistoryServiceMapper.toJpa(logData));
         var dataToSave = teamMemberServiceMapper.toJpa(dataToSaveDto);
         dataToSave.setRole(jpaRoleRepository.findByName(Role.MEMBER));
         jpaTeamMemberRepository.save(dataToSave);
@@ -161,6 +163,7 @@ public class DefaultTeamMemberProcessor implements ITeamMemberProcessor {
                 .user(userId)
                 .team(findTeam.getId())
                 .status(InviteStatus.PENDING)
+                .type(InviteStatusType.REQUEST)
                 .build();
         jpaTeamInviteHistoryRepository.save(teamInviteHistoryServiceMapper.toJpa(dataToSave));
     }

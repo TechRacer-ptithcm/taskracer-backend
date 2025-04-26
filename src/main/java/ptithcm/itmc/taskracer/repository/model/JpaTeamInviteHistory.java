@@ -3,6 +3,7 @@ package ptithcm.itmc.taskracer.repository.model;
 import jakarta.persistence.*;
 import lombok.*;
 import ptithcm.itmc.taskracer.repository.model.enumeration.InviteStatus;
+import ptithcm.itmc.taskracer.repository.model.enumeration.InviteStatusType;
 
 import java.util.UUID;
 
@@ -28,4 +29,7 @@ public class JpaTeamInviteHistory extends Auditable{
 
     @Enumerated(EnumType.STRING)
     private InviteStatus status;
+
+    @Enumerated(EnumType.STRING)
+    private InviteStatusType type;
 }
