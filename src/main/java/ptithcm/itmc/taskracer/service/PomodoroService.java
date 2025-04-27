@@ -14,8 +14,8 @@ import java.util.UUID;
 public class PomodoroService {
     private final IPomodoroProcessor processor;
 
-    public PomodoroDto startPomodoro(UUID userId, Long endTime) {
-        return processor.startPomodoro(userId, endTime);
+    public PomodoroDto startPomodoro(UUID userId, PomodoroDto pomodoroDto) {
+        return processor.startPomodoro(userId, pomodoroDto);
     }
 
     public PomodoroDto checkpoint(UUID userId) { //TODO: increase point to ranking

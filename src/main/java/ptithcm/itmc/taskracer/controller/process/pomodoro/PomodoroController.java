@@ -22,10 +22,13 @@ public class PomodoroController {
     private final PomodoroService pomodoroService;
 
     @PostMapping("start")
-    public ResponseEntity<ResponseAPI<?>> startPomodoro(@RequestBody Map<String, Long> request) {
+    public ResponseEntity<ResponseAPI<?>> startPomodoro(@RequestBody PomodoroStartRequest request) {
         var userData = authHelper.getUser();
-        Long endTime = request.get("endTime");
-        var data = pomodoroService.startPomodoro(userData.getId(), endTime);
+        var end = request.getEndTime();
+        var pomodoroDto = PomodoroDto.builder()
+                .endTime(end)
+                .build();
+        var data = pomodoroService.startPomodoro(userData.getId(), pomodoroDto);
         var result = ResponseAPI.builder()
                 .data(data)
                 .code(ResponseCode.SUCCESS.getCode())
