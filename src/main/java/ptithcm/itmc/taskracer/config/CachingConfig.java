@@ -33,11 +33,15 @@ public class CachingConfig {
     @Value("${task-racer.expire.minute}")
     private int expireTime;
 
+    @Value("${spring.data.redis.password}")
+    private String password;
+
     @Bean
     public LettuceConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
         config.setHostName(host);
         config.setPort(port);
+        config.setPassword(password);
         log.info("Redis host: {}, port: {}", host, port);
         GenericObjectPoolConfig<?> poolConfig = new GenericObjectPoolConfig<>();
         poolConfig.setMaxTotal(10);
