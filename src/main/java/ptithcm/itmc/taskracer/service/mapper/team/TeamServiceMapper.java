@@ -2,6 +2,7 @@ package ptithcm.itmc.taskracer.service.mapper.team;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.springframework.util.StringUtils;
 import ptithcm.itmc.taskracer.repository.model.JpaTeam;
 import ptithcm.itmc.taskracer.repository.model.JpaUser;
@@ -23,6 +24,7 @@ public interface TeamServiceMapper {
                 .build();
     }
 
+    @Named("teamMap")
     Set<UUID> map(Set<JpaUser> users);
 
     @Mapping(target = "owner.id", source = "ownerId")

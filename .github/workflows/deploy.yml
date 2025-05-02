@@ -77,5 +77,6 @@ jobs:
               -e REDIS_PORT="${{ secrets.REDIS_PORT }}" \
               -e LOGGING_HOST="${{ secrets.LOGGING_HOST }}" \
               -e LOGGING_PORT="${{ secrets.LOGGING_PORT }}" \
+              -e REDIS_PASSWORD="${{ secrets.REDIS_PASSWORD }}" \
               taskracer:${IMAGE_TAG}
           EOF
