@@ -35,3 +35,7 @@ logging:
     enabled: false
     host: localhost
     port: 5000
+
+taskracer:
+  file:
+    storage-dir: D:/taskracer-data

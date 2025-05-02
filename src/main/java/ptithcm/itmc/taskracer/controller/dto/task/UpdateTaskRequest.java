@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import ptithcm.itmc.taskracer.repository.model.enumeration.Priority;
 import ptithcm.itmc.taskracer.repository.model.enumeration.ResourceType;
 import ptithcm.itmc.taskracer.repository.model.enumeration.TaskStatus;
+import ptithcm.itmc.taskracer.repository.model.enumeration.TaskType;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -35,4 +36,6 @@ public class UpdateTaskRequest {
     private LocalDateTime dueAt;
 
     private TaskStatus status;
+
+    private TaskType taskType;
 }

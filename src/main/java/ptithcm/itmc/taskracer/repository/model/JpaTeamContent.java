@@ -3,6 +3,7 @@ package ptithcm.itmc.taskracer.repository.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -28,10 +29,10 @@ public class JpaTeamContent extends Auditable{
     @Column(nullable = false)
     private String content;
 
-    @Column(name="file_attachment_url")
-    private String fileAttachmentUrl;
-
     @Column(name="like_count", nullable = false)
     private Integer likeCount;
+
+    @OneToMany(mappedBy = "contentId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<JpaFileAttachment> fileAttachment;
 
 }

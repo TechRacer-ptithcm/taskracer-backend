@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import ptithcm.itmc.taskracer.repository.model.enumeration.Priority;
 import ptithcm.itmc.taskracer.repository.model.enumeration.ResourceType;
 import ptithcm.itmc.taskracer.repository.model.enumeration.TaskStatus;
+import ptithcm.itmc.taskracer.repository.model.enumeration.TaskType;
 import ptithcm.itmc.taskracer.service.dto.user.UserDto;
 
 import java.io.Serializable;
@@ -42,5 +43,7 @@ public class TaskDto implements Serializable {
     private TaskStatus status;
 
     private Set<UserDto> users;
+
+    private TaskType taskType;
 
 }
