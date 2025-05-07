@@ -67,6 +67,8 @@ jobs:
             echo "Running new container with -e secrets..."
             docker run -d --name taskracer \
               -p 8080:8080 \
+              -v /root/storage-data:${{ secrets.STORAGE_DIR }} \
+              -e STORAGE_DIR="${{ secrets.STORAGE_DIR }}" \
               -e SPRING_PROFILES_ACTIVE=docker\
               -e JDBC_URL="${{ secrets.JDBC_URL }}" \
               -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
