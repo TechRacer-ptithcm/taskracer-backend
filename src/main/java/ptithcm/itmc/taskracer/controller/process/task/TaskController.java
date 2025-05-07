@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ptithcm.itmc.taskracer.common.web.enumeration.ResponseCode;
 import ptithcm.itmc.taskracer.common.web.response.ResponseAPI;
+import ptithcm.itmc.taskracer.common.web.response.ResponseMessage;
 import ptithcm.itmc.taskracer.controller.dto.task.CreateTaskRequest;
 import ptithcm.itmc.taskracer.controller.dto.task.HandleUserInTaskRequest;
 import ptithcm.itmc.taskracer.controller.dto.task.UpdateTaskRequest;
@@ -97,10 +98,10 @@ public class TaskController {
 
     @PostMapping("task/assign-user")
     public ResponseEntity<ResponseAPI<?>> assignUserToTask(@RequestBody HandleUserInTaskRequest request) {
-        var data = taskService.addUserToTask(taskControllerMapper.toDto(request));
-        var formatData = taskControllerMapper.toDomain(data);
+        var userData = authHelper.getUser();
+        taskService.addUserToTask(taskControllerMapper.toDto(request), userData.getId());
         var result = ResponseAPI.builder()
-                .data(formatData)
+                .data(new ResponseMessage("Successfully assigned this user."))
                 .code(ResponseCode.SUCCESS.getCode())
                 .message(ResponseCode.SUCCESS.getMessage())
                 .status(true)
@@ -110,10 +111,10 @@ public class TaskController {
 
     @PostMapping("task/remove-user")
     public ResponseEntity<ResponseAPI<?>> removeUserFromTask(@RequestBody HandleUserInTaskRequest request) {
-        var data = taskService.removeUserFromTask(taskControllerMapper.toDto(request));
-        var formatData = taskControllerMapper.toDomain(data);
+        var userData = authHelper.getUser();
+        taskService.removeUserFromTask(taskControllerMapper.toDto(request), userData.getId());
         var result = ResponseAPI.builder()
-                .data(formatData)
+                .data(new ResponseMessage("Successfully remove this user."))
                 .code(ResponseCode.SUCCESS.getCode())
                 .message(ResponseCode.SUCCESS.getMessage())
                 .status(true)

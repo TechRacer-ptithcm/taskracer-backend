@@ -1,19 +1,17 @@
 package ptithcm.itmc.taskracer.repository.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.UUID;
 
 @Entity
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name = "tasks_assignees", schema = "content")
+@Table(name = "task_assignees", schema = "content")
 public class JpaTaskAssignees {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

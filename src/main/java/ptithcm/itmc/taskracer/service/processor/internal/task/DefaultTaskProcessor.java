@@ -3,7 +3,9 @@ package ptithcm.itmc.taskracer.service.processor.internal.task;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ptithcm.itmc.taskracer.exception.DuplicateDataException;
 import ptithcm.itmc.taskracer.exception.ResourceNotFound;
+import ptithcm.itmc.taskracer.repository.JpaTaskAssigneesRepository;
 import ptithcm.itmc.taskracer.repository.JpaTaskRepository;
 import ptithcm.itmc.taskracer.repository.JpaUserRepository;
 import ptithcm.itmc.taskracer.repository.model.JpaTask;
@@ -20,6 +22,7 @@ import java.util.UUID;
 public class DefaultTaskProcessor implements ITaskProcessor {
     private final JpaUserRepository jpaUserRepository;
     private final JpaTaskRepository jpaTaskRepository;
+    private final JpaTaskAssigneesRepository jpaTaskAssigneesRepository;
     private final TaskMapper taskMapper;
     @Override
     public JpaTask createTask(TaskDto taskDto) {
@@ -55,12 +58,23 @@ public class DefaultTaskProcessor implements ITaskProcessor {
     }
 
     @Override
-    public JpaTask addUserToTask(HandleUserDto request) {
-        return null;
+    public void addUserToTask(HandleUserDto request, UUID userId) {
+        if(jpaTaskAssigneesRepository.findByUserId(request.getUserId()).isPresent())
+        {
+            throw new DuplicateDataException("User has already assigned this task");
+        }
+        var data = jpaTaskAssigneesRepository.save(taskMapper.toJpa(request));
+        log.info("assign user: {}", data);
     }
 
     @Override
-    public JpaTask removeUserFromTask(HandleUserDto request) {
-        return null;
+    public void removeUserFromTask(HandleUserDto request, UUID userId) {
+        var getData = jpaTaskAssigneesRepository.findByUserId(request.getUserId());
+        if(getData.isEmpty())
+        {
+            throw new ResourceNotFound("User not assign this task");
+        }
+        log.info("remove user: {}", getData);
+        jpaTaskAssigneesRepository.delete(getData.get());
     }
 }

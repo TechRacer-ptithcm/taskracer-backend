@@ -9,10 +9,9 @@ import ptithcm.itmc.taskracer.repository.model.JpaTeam;
 import ptithcm.itmc.taskracer.repository.model.enumeration.Visibility;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
-public interface JpaTeamRepository extends JpaRepository<JpaTeam, UUID> {
+public interface JpaTeamRepository extends JpaRepository<JpaTeam, Integer> {
     Optional<JpaTeam> findBySlug(String slug);
 
     Page<JpaTeam> findAllByVisibility(@NonNull Pageable pageable, Visibility visibility);

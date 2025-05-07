@@ -33,7 +33,7 @@ public class CachingConfig {
     @Value("${task-racer.expire.minute}")
     private int expireTime;
 
-    @Value("${spring.data.redis.password}")
+    @Value("${spring.data.redis.password:}")
     private String password;
 
     @Bean

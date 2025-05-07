@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20250505142700-1" author="VinhNguyenD23">
+        <addDefaultValue tableName="team_contents"
+                         schemaName="content"
+                         columnName="like_count"
+                         defaultValue="0"/>
+    </changeSet>
+</databaseChangeLog>

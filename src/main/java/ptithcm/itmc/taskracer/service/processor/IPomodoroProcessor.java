@@ -10,6 +10,4 @@ public interface IPomodoroProcessor {
     PomodoroDto checkpoint(UUID userId);
 
     PomodoroDto stopPomodoro(UUID userId);
-
-    PomodoroDto getStartTime(UUID userId);
 }

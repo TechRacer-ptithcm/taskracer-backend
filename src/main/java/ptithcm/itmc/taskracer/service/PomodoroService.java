@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ptithcm.itmc.taskracer.service.dto.pomodoro.PomodoroDto;
 import ptithcm.itmc.taskracer.service.processor.IPomodoroProcessor;
+import ptithcm.itmc.taskracer.service.provider.IPomodoroProvider;
 
 import java.util.UUID;
 
@@ -13,6 +14,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class PomodoroService {
     private final IPomodoroProcessor processor;
+    private final IPomodoroProvider provider;
 
     public PomodoroDto startPomodoro(UUID userId, PomodoroDto pomodoroDto) {
         return processor.startPomodoro(userId, pomodoroDto);
@@ -27,6 +29,6 @@ public class PomodoroService {
     }
 
     public PomodoroDto getStartTime(UUID userId) {
-        return processor.getStartTime(userId);
+        return provider.getStartTime(userId);
     }
 }

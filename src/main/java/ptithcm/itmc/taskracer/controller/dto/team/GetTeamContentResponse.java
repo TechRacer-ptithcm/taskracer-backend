@@ -4,8 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ptithcm.itmc.taskracer.service.dto.team.TeamDto;
-import ptithcm.itmc.taskracer.service.dto.user.UserDto;
+import ptithcm.itmc.taskracer.common.file.FileResponse;
 
 import java.util.List;
 import java.util.UUID;
@@ -17,13 +16,13 @@ import java.util.UUID;
 public class GetTeamContentResponse {
     private UUID id;
 
-    private UserDto userId;
+    private UUID userId;
 
-    private TeamDto teamId;
+    private Integer teamId;
 
     private String content;
 
-    private List<String> fileAttachmentUrl;
+    private List<FileResponse> fileAttachmentUrl;
 
     private Integer likeCount;
 }

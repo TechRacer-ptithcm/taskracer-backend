@@ -13,7 +13,7 @@ public interface ITaskProcessor {
 
     JpaTask deleteTask(UUID id, UUID ownerId);
 
-    JpaTask addUserToTask(HandleUserDto request);
+    void addUserToTask(HandleUserDto request, UUID userId);
 
-    JpaTask removeUserFromTask(HandleUserDto request);
+    void removeUserFromTask(HandleUserDto request, UUID userId);
 }
