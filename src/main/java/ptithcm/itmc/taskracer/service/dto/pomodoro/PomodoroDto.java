@@ -12,5 +12,6 @@ import lombok.NoArgsConstructor;
 public class PomodoroDto {
     Long startTime;
     Long checkpointTime;
+    Long endTime;
     Integer point;
 }

@@ -34,7 +34,7 @@ public class DefaultPomodoroProcessor implements IPomodoroProcessor {
     }
 
     @Override
-    public PomodoroDto startPomodoro(UUID userId) {
+    public PomodoroDto startPomodoro(UUID userId, PomodoroDto pomodoroDto) {
         String key = "pomodoro::" + userId;
         Long timestamp = Instant.now().getEpochSecond();
         var existPomodoro = redisTemplate.opsForValue().get(key);
@@ -42,9 +42,11 @@ public class DefaultPomodoroProcessor implements IPomodoroProcessor {
         if (existPomodoro != null) {
             throw new RuntimeException("Pomodoro is already started.");
         }
+        Long endTime = pomodoroDto.getEndTime();
         var dataToSave = PomodoroDto.builder()
                 .startTime(timestamp)
                 .checkpointTime(timestamp)
+                .endTime(endTime)
                 .point(0)
                 .build();
         redisTemplate.opsForValue().set(key,
@@ -87,5 +89,17 @@ public class DefaultPomodoroProcessor implements IPomodoroProcessor {
         //TODO: add point
         log.info("pomodoro:: time: {} - {}", getPomodoroTime.getStartTime(), getPomodoroTime.getCheckpointTime());
         return getPomodoroTime;
+    }
+
+    @Override
+    public PomodoroDto getStartTime(UUID userId) {
+        String key = "pomodoro::" + userId;        
+        var rawData = redisTemplate.opsForValue().get(key);
+        if (rawData == null) {
+            log.info("No active pomodoro session found for user: {}", userId);
+            throw new RuntimeException("Pomodoro session not found");
+        }
+        var pomodoroDto = ParseObject.parse(rawData, PomodoroDto.class);
+        return pomodoroDto;
     }
 }
