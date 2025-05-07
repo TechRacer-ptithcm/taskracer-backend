@@ -1,5 +1,6 @@
 package ptithcm.itmc.taskracer.repository.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -7,7 +8,8 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -20,11 +22,11 @@ public class JpaTeamContent extends Auditable{
 
     @ManyToOne
     @JoinColumn(name="user_id", nullable = false)
-    private JpaUser userId;
+    private JpaUser user;
 
     @ManyToOne
     @JoinColumn(name="team_id", nullable = false)
-    private JpaTeam teamId;
+    private JpaTeam team;
 
     @Column(nullable = false)
     private String content;
@@ -33,6 +35,7 @@ public class JpaTeamContent extends Auditable{
     private Integer likeCount;
 
     @OneToMany(mappedBy = "contentId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<JpaFileAttachment> fileAttachment;
 
 }

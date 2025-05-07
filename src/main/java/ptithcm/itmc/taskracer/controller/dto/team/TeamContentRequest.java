@@ -1,4 +1,4 @@
-package ptithcm.itmc.taskracer.service.dto.pomodoro;
+package ptithcm.itmc.taskracer.controller.dto.team;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,9 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PomodoroDto {
-    Long startTime;
-    Long checkpointTime;
-    Long endTime;
-    Integer point;
+public class TeamContentRequest {
+    private String content;
 }

@@ -56,15 +56,15 @@ public class TaskService {
         return mapper.toDto(data);
     }
 
+    @Transactional
     @CacheEvict(value = "task", key = "#p0.taskId")
-    public TaskDto addUserToTask(HandleUserDto request) {
-        var data = processor.addUserToTask(request); //Stage 2
-        return mapper.toDto(data);
+    public void addUserToTask(HandleUserDto request, UUID userId) {
+        processor.addUserToTask(request, userId); //Stage 2
     }
 
+    @Transactional
     @CacheEvict(value = "task", key = "#p0.taskId")
-    public TaskDto removeUserFromTask(HandleUserDto request) {
-        var data = processor.removeUserFromTask(request); //Stage 2
-        return mapper.toDto(data);
+    public void removeUserFromTask(HandleUserDto request, UUID userId) {
+        processor.removeUserFromTask(request, userId); //Stage 2
     }
 }

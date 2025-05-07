@@ -10,5 +10,5 @@ public interface ITeamContentProcessor {
 
    JpaTeamContent update(TeamContentDto content);
 
-   void delete(UUID id, UUID userId);
+   void delete(UUID contentId);
 }

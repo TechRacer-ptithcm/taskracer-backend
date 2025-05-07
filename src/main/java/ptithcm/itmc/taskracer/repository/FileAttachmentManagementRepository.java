@@ -21,7 +21,9 @@ public class FileAttachmentManagementRepository {
     public FileInfo storeFile(MultipartFile file)  throws IOException {
         var path = Path.of(storageDir);
         var fileExtension = StringUtils.getFilenameExtension(file.getOriginalFilename());
-        var fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        var fileName = StringUtils.cleanPath(file.getOriginalFilename()).toLowerCase()
+                .replaceAll("[^a-z0-9.\\s]", "")
+                .replaceAll("\\s+", "-");
         var nameWithoutExtension = fileName.replace("." + fileExtension, "");
         var getRandomUUID = UUID.randomUUID().toString();
         var finalName = nameWithoutExtension + "-" + getRandomUUID + "." + fileExtension;

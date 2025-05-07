@@ -34,7 +34,7 @@ public class DefaultPomodoroProcessor implements IPomodoroProcessor {
     }
 
     @Override
-    public PomodoroDto startPomodoro(UUID userId) {
+    public PomodoroDto startPomodoro(UUID userId, PomodoroDto pomodoroDto) {
         String key = "pomodoro::" + userId;
         Long timestamp = Instant.now().getEpochSecond();
         var existPomodoro = redisTemplate.opsForValue().get(key);
@@ -42,9 +42,11 @@ public class DefaultPomodoroProcessor implements IPomodoroProcessor {
         if (existPomodoro != null) {
             throw new RuntimeException("Pomodoro is already started.");
         }
+        Long endTime = pomodoroDto.getEndTime();
         var dataToSave = PomodoroDto.builder()
                 .startTime(timestamp)
                 .checkpointTime(timestamp)
+                .endTime(endTime)
                 .point(0)
                 .build();
         redisTemplate.opsForValue().set(key,
@@ -88,4 +90,6 @@ public class DefaultPomodoroProcessor implements IPomodoroProcessor {
         log.info("pomodoro:: time: {} - {}", getPomodoroTime.getStartTime(), getPomodoroTime.getCheckpointTime());
         return getPomodoroTime;
     }
+
+
 }

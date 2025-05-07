@@ -1,5 +1,6 @@
 package ptithcm.itmc.taskracer.repository.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,6 +12,7 @@ import ptithcm.itmc.taskracer.repository.model.enumeration.TaskStatus;
 import ptithcm.itmc.taskracer.repository.model.enumeration.TaskType;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -61,4 +63,8 @@ public class JpaTask {
     @Column(name = "task_type", nullable = false)
     @Enumerated(EnumType.STRING)
     private TaskType taskType;
+
+    @OneToMany(mappedBy = "taskId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private Set<JpaTaskAssignees> assignees;
 }

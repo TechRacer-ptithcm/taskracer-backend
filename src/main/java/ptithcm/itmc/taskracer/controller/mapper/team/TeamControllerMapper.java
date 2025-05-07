@@ -21,9 +21,11 @@ public interface TeamControllerMapper {
 
     TeamDto toDto(UpdateTeamRequest team);
 
+
     GetTeamContentResponse toDomain(TeamContentDto team);
 
-    PageableObject<List<GetTeamResponse>> toDomain(PageableObject<List<TeamContentDto>> team);
+    PageableObject<List<GetTeamContentResponse>> toDomain(PageableObject<List<TeamContentDto>> team);
 
-    TeamContentDto toDto(CreateNewTeamContentRequest request);
+    TeamContentDto toDto(TeamContentRequest request);
+
 }

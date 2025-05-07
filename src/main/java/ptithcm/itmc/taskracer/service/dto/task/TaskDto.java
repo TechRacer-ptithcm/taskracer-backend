@@ -8,7 +8,6 @@ import ptithcm.itmc.taskracer.repository.model.enumeration.Priority;
 import ptithcm.itmc.taskracer.repository.model.enumeration.ResourceType;
 import ptithcm.itmc.taskracer.repository.model.enumeration.TaskStatus;
 import ptithcm.itmc.taskracer.repository.model.enumeration.TaskType;
-import ptithcm.itmc.taskracer.service.dto.user.UserDto;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -42,7 +41,7 @@ public class TaskDto implements Serializable {
 
     private TaskStatus status;
 
-    private Set<UserDto> users;
+    private Set<UUID> users;
 
     private TaskType taskType;
 
