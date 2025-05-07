@@ -15,7 +15,3 @@ public class PomodoroDto {
     Long endTime;
     Integer point;
 }
-
-public class PomodoroStartRequest {
-    private Long endTime;
-}

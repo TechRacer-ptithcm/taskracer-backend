@@ -1,5 +1,7 @@
 package ptithcm.itmc.taskracer.controller.process.pomodoro;
 
+import ptithcm.itmc.taskracer.controller.mapper.pomodoro.PomodoroControllerMapper;
+import ptithcm.itmc.taskracer.controller.dto.pomodoro.PomodoroStartRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,17 +22,15 @@ import java.util.Map;
 public class PomodoroController {
     private final AuthHelper authHelper;
     private final PomodoroService pomodoroService;
+    private final PomodoroControllerMapper pomodoroControllerMapper;
 
     @PostMapping("start")
     public ResponseEntity<ResponseAPI<?>> startPomodoro(@RequestBody PomodoroStartRequest request) {
         var userData = authHelper.getUser();
-        var end = request.getEndTime();
-        var pomodoroDto = PomodoroDto.builder()
-                .endTime(end)
-                .build();
-        var data = pomodoroService.startPomodoro(userData.getId(), pomodoroDto);
+        var pomodoroRequest = pomodoroControllerMapper.toDto(request);
+        var pomodoroResponse = pomodoroService.startPomodoro(userData.getId(), pomodoroRequest);
         var result = ResponseAPI.builder()
-                .data(data)
+                .data(pomodoroResponse)
                 .code(ResponseCode.SUCCESS.getCode())
                 .message(ResponseCode.SUCCESS.getMessage())
                 .status(true)
