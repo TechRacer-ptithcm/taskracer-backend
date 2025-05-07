@@ -92,7 +92,7 @@ public class TeamController {
         return ResponseEntity.status(HttpStatus.OK).body(resp);
     }
 
-    @PostMapping("team/{slug}/remove/{userId}")
+    @DeleteMapping("team/{slug}/remove/{userId}")
     public ResponseEntity<ResponseAPI<?>> removeUserFromTeam(@PathVariable String slug, @PathVariable UUID userId) {
         var getUser = authHelper.getUser();
         teamService.removeUserFromTeam(slug, getUser.getId(), userId);
@@ -180,6 +180,19 @@ public class TeamController {
                 .data(new ResponseMessage("Accept request join team: " + slug + " successful"))
                 .status(true)
                 .build();
+        return ResponseEntity.status(HttpStatus.OK).body(resp);
+    }
+
+    @PostMapping("team/{slug}/join")
+    public ResponseEntity<ResponseAPI<?>> joinTeam(@PathVariable String slug) {
+        var getUser = authHelper.getUser();
+        teamService.joinTeam(slug, getUser.getId());
+        var resp = ResponseAPI.builder()
+               .code(ResponseCode.SUCCESS.getCode())
+               .message(ResponseCode.SUCCESS.getMessage())
+               .status(true)
+              .data(new ResponseMessage("Join team: " + slug + " successful"))
+              .build();
         return ResponseEntity.status(HttpStatus.OK).body(resp);
     }
 }
