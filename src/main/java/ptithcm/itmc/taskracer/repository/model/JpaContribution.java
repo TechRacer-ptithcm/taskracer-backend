@@ -3,6 +3,7 @@ package ptithcm.itmc.taskracer.repository.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = true)
@@ -17,10 +18,12 @@ public class JpaContribution extends Auditable {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    private LocalDateTime date;
+
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private JpaUser user;
 
-    @Column(name = "score", nullable = false)
-    private Long score;
+    @Column(name = "minutes", nullable = false)
+    private Integer minute;
 }

@@ -14,6 +14,7 @@ import ptithcm.itmc.taskracer.service.dto.task.TaskDto;
 import ptithcm.itmc.taskracer.service.mapper.task.TaskMapper;
 import ptithcm.itmc.taskracer.service.processor.ITaskProcessor;
 
+import java.util.HashSet;
 import java.util.UUID;
 
 @Component
@@ -24,12 +25,16 @@ public class DefaultTaskProcessor implements ITaskProcessor {
     private final JpaTaskRepository jpaTaskRepository;
     private final JpaTaskAssigneesRepository jpaTaskAssigneesRepository;
     private final TaskMapper taskMapper;
+
     @Override
     public JpaTask createTask(TaskDto taskDto) {
-        if(jpaUserRepository.findById(taskDto.getOwner()).isEmpty()) {
+        if (jpaUserRepository.findById(taskDto.getOwner()).isEmpty()) {
             throw new ResourceNotFound("User not found.");
         }
         var saveData = taskMapper.toJpa(taskDto);
+        if (saveData.getAssignees() == null) {
+            saveData.setAssignees(new HashSet<>());
+        }
         var data = jpaTaskRepository.saveCustom(saveData);
         log.info("create task: {}", data);
         return data;
@@ -59,8 +64,7 @@ public class DefaultTaskProcessor implements ITaskProcessor {
 
     @Override
     public void addUserToTask(HandleUserDto request, UUID userId) {
-        if(jpaTaskAssigneesRepository.findByUserId(request.getUserId()).isPresent())
-        {
+        if (jpaTaskAssigneesRepository.findByUserId(request.getUserId()).isPresent()) {
             throw new DuplicateDataException("User has already assigned this task");
         }
         var data = jpaTaskAssigneesRepository.save(taskMapper.toJpa(request));
@@ -70,8 +74,7 @@ public class DefaultTaskProcessor implements ITaskProcessor {
     @Override
     public void removeUserFromTask(HandleUserDto request, UUID userId) {
         var getData = jpaTaskAssigneesRepository.findByUserId(request.getUserId());
-        if(getData.isEmpty())
-        {
+        if (getData.isEmpty()) {
             throw new ResourceNotFound("User not assign this task");
         }
         log.info("remove user: {}", getData);
