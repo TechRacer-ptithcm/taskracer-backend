@@ -12,6 +12,7 @@ import ptithcm.itmc.taskracer.service.mapper.user.UserServiceMapper;
 import ptithcm.itmc.taskracer.service.provider.IUserProvider;
 
 import java.util.List;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -19,9 +20,19 @@ import java.util.List;
 public class DefaultUserProvider implements IUserProvider {
     private final JpaUserRepository jpaUserRepository;
     private final UserServiceMapper userServiceMapper;
+
     @Override
     public JpaUser getUserDataByUserName(String username) {
         var data = jpaUserRepository.findByUsername(username);
+        if (data.isEmpty()) {
+            throw new ResourceNotFound("User not found.");
+        }
+        return data.get();
+    }
+
+    @Override
+    public JpaUser getUserDataByUserId(UUID userId) {
+        var data = jpaUserRepository.findById(userId);
         if (data.isEmpty()) {
             throw new ResourceNotFound("User not found.");
         }
