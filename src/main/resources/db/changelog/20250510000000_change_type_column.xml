@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20250510000000-1" author="VinhNguyenD23">
+        <addColumn tableName="rankings" schemaName="social">
+            <column name="rank_id_int" type="INTEGER"/>
+        </addColumn>
+        <dropColumn tableName="rankings" schemaName="social" columnName="rank_id"/>
+
+        <renameColumn tableName="rankings"
+                      schemaName="social"
+                      oldColumnName="rank_id_int"
+                      newColumnName="rank_id"
+                      columnDataType="INTEGER"/>
+    </changeSet>
+
+    <changeSet id="20250510000000-2" author="VinhNguyenD23">
+        <addForeignKeyConstraint
+                baseTableName="rankings"
+                baseColumnNames="rank_id"
+                baseTableSchemaName="social"
+                referencedTableName="rank_data"
+                referencedColumnNames="id"
+                referencedTableSchemaName="social"
+                constraintName="fk_rankings_rankdata"/>
+    </changeSet>
+</databaseChangeLog>

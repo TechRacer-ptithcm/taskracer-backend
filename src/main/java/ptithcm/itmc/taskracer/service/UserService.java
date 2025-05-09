@@ -13,6 +13,7 @@ import ptithcm.itmc.taskracer.service.processor.IUserProcessor;
 import ptithcm.itmc.taskracer.service.provider.IUserProvider;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +27,12 @@ public class UserService {
     public UserDto getUserDataByUserName(String username) {
         log.info("Get user data by username: {}", username);
         var data = provider.getUserDataByUserName(username);
+        return mapper.toDto(data);
+    }
+
+    public UserDto getUserDataById(UUID userId) {
+        log.info("Get user data by id: {}", userId);
+        var data = provider.getUserDataByUserId(userId);
         return mapper.toDto(data);
     }
 

@@ -13,6 +13,9 @@ import ptithcm.itmc.taskracer.controller.dto.user.UpdateUserRequest;
 import ptithcm.itmc.taskracer.controller.mapper.user.UserControllerMapper;
 import ptithcm.itmc.taskracer.helper.AuthHelper;
 import ptithcm.itmc.taskracer.service.UserService;
+import ptithcm.itmc.taskracer.service.dto.user.UserDto;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("social")
@@ -54,8 +57,14 @@ public class UserController {
     }
 
     @GetMapping("user")
-    public ResponseEntity<ResponseAPI<?>> getUser(@RequestParam(value = "username") String username) {
-        var data = userService.getUserDataByUserName(username);
+    public ResponseEntity<ResponseAPI<?>> getUser(@RequestParam(value = "username", required = false) String username,
+                                                  @RequestParam(value = "id", required = false) UUID userId) {
+        UserDto data;
+        if (username == null || username == "") {
+            data = userService.getUserDataById(userId);
+        } else {
+            data = userService.getUserDataByUserName(username);
+        }
         var result = ResponseAPI.builder()
                 .code(ResponseCode.SUCCESS.getCode())
                 .message(ResponseCode.SUCCESS.getMessage())
@@ -76,10 +85,5 @@ public class UserController {
                 .data(userControllerMapper.toDomain(data))
                 .build();
         return ResponseEntity.ok(result);
-    }
-
-    @GetMapping("dashboard")
-    public ResponseEntity<ResponseAPI<?>> getDashboard() {
-        return null;
     }
 }

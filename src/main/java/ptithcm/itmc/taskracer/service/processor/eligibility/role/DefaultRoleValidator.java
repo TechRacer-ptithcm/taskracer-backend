@@ -22,10 +22,10 @@ public class DefaultRoleValidator implements IEligibilityRoleValidator {
     public void validate(UUID userId, Integer teamId, Permission permission) {
         log.info("Validate user {} with team {}", userId, teamId);
         var getUser = jpaTeamMemberRepository.findByUserIdAndTeamId(userId, teamId);
-        log.info("Get permission user: {}", getUser.get().getRole().getPermissions());
         if(getUser.isEmpty()) {
             throw new RoleInsufficientException("User: "+ userId +" does not have permission "+  permission );
         }
+        log.info("Get permission user: {}", getUser.get().getRole().getPermissions());
         getUser.get()
                 .getRole()
                 .getPermissions()

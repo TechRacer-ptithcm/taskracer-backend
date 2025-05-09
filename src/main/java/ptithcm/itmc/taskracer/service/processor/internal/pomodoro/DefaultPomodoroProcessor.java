@@ -1,13 +1,18 @@
 package ptithcm.itmc.taskracer.service.processor.internal.pomodoro;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import ptithcm.itmc.taskracer.repository.JpaUserRepository;
 import ptithcm.itmc.taskracer.service.dto.pomodoro.PomodoroDto;
+import ptithcm.itmc.taskracer.service.processor.IContributionProcessor;
 import ptithcm.itmc.taskracer.service.processor.IPomodoroProcessor;
+import ptithcm.itmc.taskracer.service.processor.IRankingProcessor;
+import ptithcm.itmc.taskracer.util.RedisDurationUtil;
 import ptithcm.itmc.taskracer.util.json.ParseObject;
 
 import java.time.Instant;
@@ -19,6 +24,9 @@ import java.util.concurrent.TimeUnit;
 @Slf4j(topic = "SERVICE-POMODORO-PROCESSOR")
 public class DefaultPomodoroProcessor implements IPomodoroProcessor {
     private final RedisTemplate<String, Object> redisTemplate;
+    private final JpaUserRepository jpaUserRepository;
+    private final IRankingProcessor rankingProcessor;
+    private final IContributionProcessor contributionProcessor;
     @Value("${task-racer.pomodoro.checkpoint}")
     private Integer pomodoroCheckPointMinute;
 
@@ -60,11 +68,24 @@ public class DefaultPomodoroProcessor implements IPomodoroProcessor {
     @Override
     public PomodoroDto checkpoint(UUID userId) {
         String key = "pomodoro::" + userId;
+        String streakKey = "streak::" + userId;
         Long timestamp = Instant.now().getEpochSecond();
         var rawData = redisTemplate.opsForValue().get(key);
         var getPomodoroTime = getRawObjectPomodoroDto(rawData);
         if (timestamp - getPomodoroTime.getCheckpointTime() < TimeUnit.MINUTES.toSeconds(pomodoroCheckPointMinute)) {
             throw new RuntimeException("Checkpoint time has not been reached yet.");
+        }
+        var currentTime = getPomodoroTime.getCheckpointTime();
+        contributionProcessor.handle(userId, currentTime, timestamp);
+        if (redisTemplate.opsForValue().get(streakKey) == null) {
+            redisTemplate.opsForValue().set(streakKey,
+                    true,
+                    RedisDurationUtil.getDurationNextDay().getSeconds(),
+                    TimeUnit.SECONDS
+            );
+            var userData = jpaUserRepository.findById(userId).get();
+            userData.setStreak(userData.getStreak() + 1);
+            jpaUserRepository.save(userData);
         }
         getPomodoroTime.setCheckpointTime(timestamp);
         getPomodoroTime.setPoint(getPomodoroTime.getPoint() + 1);
@@ -77,6 +98,7 @@ public class DefaultPomodoroProcessor implements IPomodoroProcessor {
 
     @Override
     @CacheEvict(value = "pomodoro", key = "#p0")
+    @Transactional
     public PomodoroDto stopPomodoro(UUID userId) {
         String key = "pomodoro::" + userId;
         var rawData = redisTemplate.opsForValue().get(key);
@@ -86,10 +108,8 @@ public class DefaultPomodoroProcessor implements IPomodoroProcessor {
         if (timestamp - getPomodoroTime.getCheckpointTime() >= TimeUnit.MINUTES.toSeconds(pomodoroCheckPointMinute)) {
             getPomodoroTime.setPoint(getPomodoroTime.getPoint() + 1);
         }
-        //TODO: add point
         log.info("pomodoro:: time: {} - {}", getPomodoroTime.getStartTime(), getPomodoroTime.getCheckpointTime());
+        rankingProcessor.handle(userId, getPomodoroTime.getPoint());
         return getPomodoroTime;
     }
-
-
 }
