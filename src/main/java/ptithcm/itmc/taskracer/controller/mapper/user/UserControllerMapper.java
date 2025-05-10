@@ -3,11 +3,14 @@ package ptithcm.itmc.taskracer.controller.mapper.user;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import ptithcm.itmc.taskracer.controller.dto.user.UpdateUserRequest;
+import ptithcm.itmc.taskracer.controller.dto.user.UserRankingResponse;
 import ptithcm.itmc.taskracer.controller.dto.user.UserResponse;
 import ptithcm.itmc.taskracer.service.dto.user.UserDto;
 
 @Mapper(componentModel = "spring")
 public interface UserControllerMapper {
+    UserRankingResponse toDomainRanking(UserDto request);
+
     UserResponse toDomain(UserDto request);
 
     @Mapping(target = "username", ignore = true)

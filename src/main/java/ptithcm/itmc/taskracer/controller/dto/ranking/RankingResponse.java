@@ -8,7 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ptithcm.itmc.taskracer.common.object.RankingData;
-import ptithcm.itmc.taskracer.controller.dto.user.UserResponse;
+import ptithcm.itmc.taskracer.controller.dto.user.UserRankingResponse;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,7 +16,7 @@ import ptithcm.itmc.taskracer.controller.dto.user.UserResponse;
 @Builder
 @Data
 public class RankingResponse<T> {
-    UserResponse user;
+    UserRankingResponse user;
     @Enumerated(EnumType.STRING)
     private Integer score;
     private T top;
