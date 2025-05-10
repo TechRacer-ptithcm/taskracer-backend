@@ -18,7 +18,7 @@ public class FileAttachmentManagementRepository {
     @Value("${taskracer.file.storage-dir}")
     private String storageDir;
 
-    public FileInfo storeFile(MultipartFile file)  throws IOException {
+    public FileInfo storeFile(MultipartFile file) throws IOException {
         var path = Path.of(storageDir);
         var fileExtension = StringUtils.getFilenameExtension(file.getOriginalFilename());
         var fileName = StringUtils.cleanPath(file.getOriginalFilename()).toLowerCase()
@@ -33,7 +33,7 @@ public class FileAttachmentManagementRepository {
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
         return FileInfo.builder()
-                .name(fileName)
+                .name(finalName)
                 .size(file.getSize())
                 .contentType(file.getContentType())
                 .md5Checksum(DigestUtils.md5DigestAsHex(file.getInputStream()))
