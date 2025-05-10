@@ -162,11 +162,11 @@ public class TeamController {
         var getUser = authHelper.getUser();
         teamService.requestToJoinTeam(slug, getUser.getId());
         var resp = ResponseAPI.builder()
-               .code(ResponseCode.SUCCESS.getCode())
-               .message(ResponseCode.SUCCESS.getMessage())
-               .status(true)
-               .data(new ResponseMessage("Request join team: " + slug + " successful"))
-               .build();
+                .code(ResponseCode.SUCCESS.getCode())
+                .message(ResponseCode.SUCCESS.getMessage())
+                .status(true)
+                .data(new ResponseMessage("Request join team: " + slug + " successful"))
+                .build();
         return ResponseEntity.status(HttpStatus.OK).body(resp);
     }
 
@@ -188,11 +188,25 @@ public class TeamController {
         var getUser = authHelper.getUser();
         teamService.joinTeam(slug, getUser.getId());
         var resp = ResponseAPI.builder()
-               .code(ResponseCode.SUCCESS.getCode())
-               .message(ResponseCode.SUCCESS.getMessage())
-               .status(true)
-              .data(new ResponseMessage("Join team: " + slug + " successful"))
-              .build();
+                .code(ResponseCode.SUCCESS.getCode())
+                .message(ResponseCode.SUCCESS.getMessage())
+                .status(true)
+                .data(new ResponseMessage("Join team: " + slug + " successful"))
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(resp);
+    }
+
+    @GetMapping("team/get-join-teams")
+    public ResponseEntity<ResponseAPI<?>> getJoinTeams(@RequestParam(value = "page", defaultValue = "1") Integer page,
+                                                       @RequestParam(value = "size", defaultValue = "10") Integer size) {
+        var userData = authHelper.getUser();
+        var data = teamService.getAllTeamJoin(userData.getId(), page, size);
+        var resp = ResponseAPI.builder()
+                .code(ResponseCode.SUCCESS.getCode())
+                .message(ResponseCode.SUCCESS.getMessage())
+                .status(true)
+                .data(data)
+                .build();
         return ResponseEntity.status(HttpStatus.OK).body(resp);
     }
 }

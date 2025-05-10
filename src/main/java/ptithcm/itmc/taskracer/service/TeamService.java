@@ -13,6 +13,7 @@ import ptithcm.itmc.taskracer.service.provider.ITeamProvider;
 
 import java.util.List;
 import java.util.UUID;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -91,5 +92,14 @@ public class TeamService {
     @Transactional
     public void acceptRequest(String slug, UUID userId, UUID requestUserId) {
         memberProcessor.acceptRequest(slug, userId, requestUserId);
+    }
+
+    public PageableObject<List<TeamDto>> getAllTeamJoin(UUID userId, int page, int size) {
+        return PageableObject.<List<TeamDto>>builder()
+                .content(mapper.toDto(provider.getJoinTeams(userId, page, size).getContent()))
+                .totalElements(provider.getAllTeam(page, size).getTotalElements())
+                .totalPage(provider.getAllTeam(page, size).getTotalPage())
+                .currentPage(provider.getAllTeam(page, size).getCurrentPage())
+                .build();
     }
 }

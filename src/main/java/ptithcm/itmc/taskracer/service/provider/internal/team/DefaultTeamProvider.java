@@ -12,6 +12,7 @@ import ptithcm.itmc.taskracer.repository.JpaTeamInviteHistoryRepository;
 import ptithcm.itmc.taskracer.repository.JpaTeamMemberRepository;
 import ptithcm.itmc.taskracer.repository.JpaTeamRepository;
 import ptithcm.itmc.taskracer.repository.model.JpaTeam;
+import ptithcm.itmc.taskracer.repository.model.JpaTeamMember;
 import ptithcm.itmc.taskracer.repository.model.enumeration.Visibility;
 import ptithcm.itmc.taskracer.service.mapper.team.TeamInviteHistoryServiceMapper;
 import ptithcm.itmc.taskracer.service.mapper.team.TeamMemberServiceMapper;
@@ -19,6 +20,7 @@ import ptithcm.itmc.taskracer.service.mapper.team.TeamServiceMapper;
 import ptithcm.itmc.taskracer.service.provider.ITeamProvider;
 
 import java.util.List;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -46,6 +48,22 @@ public class DefaultTeamProvider implements ITeamProvider {
                 .totalElements(data.getTotalElements())
                 .totalPage(data.getTotalPages())
                 .currentPage(data.getNumber())
+                .build();
+    }
+
+    @Override
+    public PageableObject<List<JpaTeam>> getJoinTeams(UUID userId, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        var getData = jpaTeamMemberRepository.findAllByUserId(userId, pageable);
+        return PageableObject.<List<JpaTeam>>builder()
+                .currentPage(getData.getNumber())
+                .totalPage(getData.getTotalPages())
+                .totalElements(getData.getTotalElements())
+                .content(getData.getContent()
+                        .stream()
+                        .map(JpaTeamMember::getTeam)
+                        .toList()
+                )
                 .build();
     }
 }

@@ -17,4 +17,6 @@ public interface JpaTeamMemberRepository extends JpaRepository<JpaTeamMember, UU
     Optional<JpaTeamMember> findByUserIdAndTeamId(UUID userId, Integer teamId);
 
     JpaTeamMember team(JpaTeam team);
+
+    Page<JpaTeamMember> findAllByUserId(UUID userId, Pageable pageable);
 }
