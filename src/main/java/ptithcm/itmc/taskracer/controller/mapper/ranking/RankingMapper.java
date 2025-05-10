@@ -13,10 +13,12 @@ public interface RankingMapper {
     @Mapping(target = "top", ignore = true)
     RankingResponse<Integer> toDomain(RankingDto request);
 
-    @Mapping(target = "rank", ignore = true)
+    @Mapping(target = "score", ignore = true)
+    @Mapping(target = "rankData", ignore = true)
     RankingResponse<Integer> toDomainInteger(TopUserDto<Integer> request);
 
-    @Mapping(target = "rank", ignore = true)
+    @Mapping(target = "score", ignore = true)
+    @Mapping(target = "rankData", ignore = true)
     RankingResponse<Double> toDomainDouble(TopUserDto<Double> request);
 
     default List<RankingResponse<Integer>> toDomain(List<RankingDto> requests) {
@@ -25,5 +27,4 @@ public interface RankingMapper {
                 .map(this::toDomain)
                 .toList();
     }
-
 }
