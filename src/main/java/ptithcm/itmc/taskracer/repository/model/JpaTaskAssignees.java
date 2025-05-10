@@ -19,7 +19,7 @@ public class JpaTaskAssignees {
 
     @ManyToOne
     @JoinColumn(name = "task_id", nullable = false)
-    private JpaTask taskId;
+    private JpaTask task;
 
     @Column(name = "user_id", nullable = false)
     private UUID userId;

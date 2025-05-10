@@ -10,6 +10,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class HandleUserDto {
-    private UUID userId;
+    private String email;
     private UUID taskId;
 }

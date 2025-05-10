@@ -9,6 +9,7 @@ import ptithcm.itmc.taskracer.repository.JpaTaskAssigneesRepository;
 import ptithcm.itmc.taskracer.repository.JpaTaskRepository;
 import ptithcm.itmc.taskracer.repository.JpaUserRepository;
 import ptithcm.itmc.taskracer.repository.model.JpaTask;
+import ptithcm.itmc.taskracer.repository.model.JpaTaskAssignees;
 import ptithcm.itmc.taskracer.service.dto.task.HandleUserDto;
 import ptithcm.itmc.taskracer.service.dto.task.TaskDto;
 import ptithcm.itmc.taskracer.service.mapper.task.TaskMapper;
@@ -64,16 +65,32 @@ public class DefaultTaskProcessor implements ITaskProcessor {
 
     @Override
     public void addUserToTask(HandleUserDto request, UUID userId) {
-        if (jpaTaskAssigneesRepository.findByUserId(request.getUserId()).isPresent()) {
+        var userData = jpaUserRepository.findByEmail(request.getEmail());
+        if (userData.isEmpty()) {
+            throw new ResourceNotFound("User id not found");
+        }
+        var existTask = jpaTaskAssigneesRepository.findByUserIdAndTaskId(userData.get().getId(), request.getTaskId());
+        if (existTask.isPresent()) {
             throw new DuplicateDataException("User has already assigned this task");
         }
-        var data = jpaTaskAssigneesRepository.save(taskMapper.toJpa(request));
+        var dataToSave = JpaTaskAssignees.builder()
+                .userId(userData.get().getId())
+                .task(JpaTask.builder()
+                        .id(request.getTaskId())
+                        .build()
+                )
+                .build();
+        var data = jpaTaskAssigneesRepository.save(dataToSave);
         log.info("assign user: {}", data);
     }
 
     @Override
     public void removeUserFromTask(HandleUserDto request, UUID userId) {
-        var getData = jpaTaskAssigneesRepository.findByUserId(request.getUserId());
+        var userData = jpaUserRepository.findByEmail(request.getEmail());
+        if (userData.isEmpty()) {
+            throw new ResourceNotFound("User id not found");
+        }
+        var getData = jpaTaskAssigneesRepository.findByUserIdAndTaskId(userData.get().getId(), request.getTaskId());
         if (getData.isEmpty()) {
             throw new ResourceNotFound("User not assign this task");
         }

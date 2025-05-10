@@ -64,7 +64,7 @@ public class JpaTask {
     @Enumerated(EnumType.STRING)
     private TaskType taskType;
 
-    @OneToMany(mappedBy = "taskId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private Set<JpaTaskAssignees> assignees;
 }

@@ -22,11 +22,11 @@ public interface TaskMapper {
     @Mapping(target = "users", expression = "java(toListUserId(jpaTask.getAssignees()))")
     TaskDto toDto(JpaTask jpaTask);
 
+    @Mapping(target = "assignees", ignore = true)
     @Mapping(source = "parent", target = "parent.id")
     JpaTask toJpa(TaskDto taskDto);
 
-    default Set<UUID> toListUserId(Set<JpaTaskAssignees> taskAssignees)
-    {
+    default Set<UUID> toListUserId(Set<JpaTaskAssignees> taskAssignees) {
         return taskAssignees.stream()
                 .map(data -> data.getId())
                 .collect(Collectors.toSet());
@@ -69,9 +69,9 @@ public interface TaskMapper {
         return jpaTask;
     }
 
+    @Mapping(target = "userId", ignore = true)
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "taskId.id", source = "taskId")
+    @Mapping(target = "task.id", source = "taskId")
     JpaTaskAssignees toJpa(HandleUserDto request);
 
-    TaskDto toDto(JpaTaskAssignees request);
 }

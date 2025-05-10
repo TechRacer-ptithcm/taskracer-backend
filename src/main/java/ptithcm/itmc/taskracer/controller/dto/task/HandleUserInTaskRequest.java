@@ -12,6 +12,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 public class HandleUserInTaskRequest {
-    private UUID userId;
+    private String email;
     private UUID taskId;
 }
