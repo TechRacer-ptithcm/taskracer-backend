@@ -28,7 +28,7 @@ public interface TaskMapper {
 
     default Set<UUID> toListUserId(Set<JpaTaskAssignees> taskAssignees) {
         return taskAssignees.stream()
-                .map(data -> data.getId())
+                .map(data -> data.getUserId())
                 .collect(Collectors.toSet());
     }
 
